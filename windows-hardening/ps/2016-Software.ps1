@@ -10,7 +10,7 @@ Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
     $REG_URL = "https://github.com/Seabreg/Regshot/raw/468afc89c23a539c8c555900cad1b4f1eb58e51f/Regshot-x64-ANSI.exe"
     $AUTORUNS_URL = "https://download.sysinternals.com/files/Autoruns.zip"
 
-    echo "`n******************** INSTALLING WAZUH AGENT ********************`n"
+    echo "`n******************** DOWNLOADING AND INSTALLING WAZUH AGENT ********************`n"
 
     wget $WAZUH_URL -OutFile "$ROOT\wazuh-agent.msi"
     $IP = Read-Host "Enter the wazuh manager IP"
@@ -18,16 +18,16 @@ Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
     Start-Sleep -Seconds 4
     NET START Wazuh
 
-    echo "`n******************** INSTALLING KF SENSOR HONEYPOT ********************`n"
+    echo "`n******************** DOWNLOADING KF SENSOR HONEYPOT ********************`n"
 
-    wget $KF_URL -OutFile "$ROOT\kfsens.msi"
+    wget $KF_URL -OutFile "$ROOT\kfsense.msi"
 
-    echo "`n******************** INSTALLING AUTORUNS ********************`n"
+    echo "`n******************** DOWNLOADING AUTORUNS ********************`n"
 
     wget $AUTORUNS_URL -OutFile $ROOT\autoruns.zip
     Expand-Archive -Path $ROOT\autoruns.zip -DestinationPath $ROOT\autoruns
 
-    echo "`n******************** INSTALLING REGSHOT ********************`n"
+    echo "`n******************** DOWNLOADING REGSHOT ********************`n"
 
     wget $REG_URL -OutFile "$ROOT\regshot.exe"
     & $ROOT\regshot.exe

@@ -28,7 +28,7 @@ Start-Transcript -Path "$LOGS\PS-MAIN-OUT.txt"
     echo "`n******************** DISABLING ROLES AND FEATURES ********************`n"
 
     echo "`nDisabling SMB1..."
-    Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol
+    Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart
 
     echo "`nDisabling RDP..."
     Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 1
@@ -66,6 +66,10 @@ Start-Transcript -Path "$LOGS\PS-MAIN-OUT.txt"
     echo "`nEnabling Firewall...`n"
     Set-NetFirewallProfile Domain,Public,Private -Enabled True
 
+	echo "`n******************** OPEN UPDATES ********************`n"
+
+	start ms-settings:windowsupdate
+	
 } | Out-Default
 
 Stop-Transcript
