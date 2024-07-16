@@ -1,8 +1,7 @@
 ﻿param($ROOT = "C:\Users\$Env:UserName\Desktop")
 
 $LOGS = "$ROOT\PS-LOGS"
-
-Start-Transcript -Path "$LOGS\PS-MAIN-OUT.txt"
+$FREQ = 15
 
 . {
     echo "`n******************** CONFIGURING USERS ********************`n"
@@ -55,8 +54,22 @@ Start-Transcript -Path "$LOGS\PS-MAIN-OUT.txt"
 
     echo "`n******************** DEFENDER AND ANTIVIRUS ********************`n"
 
-    echo "`nUpdating signatures is disabled by default (it takes a while to download)..."
-    #Update-MpSignature
+    echo "`nUpdating signatures in new window..."
+    Start-Process powershell "echo 'Updating AV signatures...'; Update-MpSignature"
+
+    echo "`nSetting protections on..."
+    Set-MpPreference -MAPSReporting Advanced
+    Set-MpPreference -SubmitSamplesConsent Always
+    Set-MpPreference -DisableBlockAtFirstSeen 0
+    Set-MpPreference -DisableIOAVProtection 0
+    Set-MpPreference -DisableRealtimeMonitoring 0
+    Set-MpPreference -DisableBehaviorMonitoring 0
+    Set-MpPreference -DisableScriptScanning 0
+    Set-MpPreference -DisableRemovableDriveScanning 0
+    Set-MpPreference -PUAProtection Enabled
+    Set-MpPreference -DisableArchiveScanning 0
+    Set-MpPreference -DisableEmailScanning 0
+    Set-MpPreference -CheckForSignaturesBeforeRunningScan 1
 
     echo "`nGetting Defender and AV status"
     Get-MpComputerStatus
@@ -70,6 +83,14 @@ Start-Transcript -Path "$LOGS\PS-MAIN-OUT.txt"
 
 	start ms-settings:windowsupdate
 	
+    echo "`n******************** SCHEDULE CHECKS TO RUN EVERY 15 MIN ********************`n"
+
+    $taskTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $FREQ) -RepetitionDuration (New-TimeSpan -Days (365 * $FREQ))
+    $taskAction = New-ScheduledTaskAction -Execute start-job {powershell $Using:PATH\2016-Checks.ps1}
+
+    Register-ScheduledTask 'Run-Checks' -Action $taskAction -Trigger $taskTrigger
+    Start-ScheduledTask 'Run-Checks'
+
 } | Out-Default
 
 Stop-Transcript
