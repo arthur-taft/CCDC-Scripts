@@ -3,6 +3,7 @@
 $LOGS = "$ROOT\PS-LOGS"
 $FREQ = 15
 
+Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
 . {
     echo "`n******************** CONFIGURING USERS ********************`n"
 
@@ -85,8 +86,9 @@ $FREQ = 15
 	
     echo "`n******************** SCHEDULE CHECKS TO RUN EVERY 15 MIN ********************`n"
 
+    Copy-Item -Path $PSScriptRoot\2016-Checks.ps1 -Destination C:\
     $taskTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $FREQ) -RepetitionDuration (New-TimeSpan -Days (365 * $FREQ))
-    $taskAction = New-ScheduledTaskAction -Execute start-job {powershell $Using:PATH\2016-Checks.ps1}
+    $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-WindowStyle hidden -F C:\2016-Checks.ps1"
 
     Register-ScheduledTask 'Run-Checks' -Action $taskAction -Trigger $taskTrigger
     Start-ScheduledTask 'Run-Checks'
