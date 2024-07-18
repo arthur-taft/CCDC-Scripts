@@ -33,15 +33,18 @@ Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
     echo "`n******************** DOWNLOADING REGSHOT ********************`n"
 
     wget $REG_URL -OutFile "$ROOT\regshot.exe"
-    & $ROOT\regshot.exe
 
-    echo "`n******************** DOWNLOADING SECURITY BASELINES AND TOOLS ********************`n"
+    echo "`n******************** DOWNLOADING AND INSTALLING SECURITY BASELINES AND TOOLS ********************`n"
 
     wget $2016_BASELINE_URL -OutFile "$ROOT\2016-baseline-toolkit.zip"
     Expand-Archive -Path $ROOT\2016-baseline-toolkit.zip -DestinationPath $ROOT\2016-baseline-toolkit
 
     wget $LGPO_URL -OutFile "$ROOT\LGPO.zip"
     Expand-Archive -Path $ROOT\LGPO.zip -DestinationPath $ROOT\LGPO
+
+    Copy-Item -Path $ROOT\LGPO\LGPO_30\LGPO.exe -Destination $ROOT\2016-baseline-toolkit\Windows-10-RS1-and-Server-2016-Security-Baseline\Local_Script\Tools\
+
+    Start-Process powershell $ROOT\2016-baseline-toolkit\Windows-10-RS1-and-Server-2016-Security-Baseline\Local_Script\Member_Server_Install.cmd
 
 } | Out-Default
 
