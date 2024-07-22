@@ -13,21 +13,3 @@ Start-Transcript -Path "$ROOT\SMB-SHARES-$TIME.txt"
 } | Out-Default
 
 Stop-Transcript
-
-Start-Transcript -Path "$ROOT\SERVICES-$TIME.txt"
-
-. {
-    echo "`n******************** GETTING SERVICES ********************`n"
-
-} | Out-Default
-
-Stop-Transcript
-
-Start-Transcript -Path "$ROOT\PROCESSES-$TIME.txt"
-
-. {
-    echo "`n******************** GETTING PROCESSES ********************`n"
-
-} | Out-Default
-
-Stop-Transcript
