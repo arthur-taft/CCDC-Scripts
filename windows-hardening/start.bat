@@ -1,3 +1,5 @@
+powershell Set-ExecutionPolicy RemoteSigned
+
 powershell ps\2016-Prelims.ps1
 powershell ps\2016-Main.ps1
 powershell ps\2016-Checks.ps1
