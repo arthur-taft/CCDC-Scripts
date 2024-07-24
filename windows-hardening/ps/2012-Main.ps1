@@ -27,20 +27,24 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
     $Password = Read-Host "Enter the new password for Printer" -AsSecureString
     net user /add Printer ([Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)))
 
-    echo "`nDisabling all users except current and Printer..."
-    net user | Where-Object {$_.Name -ne $Env:UserName -and $_.Name -ne "Printer"} | net user /active:no
+    echo "`nDisabling all users except current and Printer...`n"
+    Get-WmiObject -Class Win32_UserAccount | ForEach-Object {
+        if ($_.Name -ne 'Administrator' -and $_.Name -ne 'Printer') {
+            echo "Disabling $($_.Name)..."
+            net user $_.Name /active:no
+            }
+        }
 
     echo "`nTo re-enable all users use this command:"
-    echo "Get-LocalUser | Where-Object {`$_.Name -ne `"Guest`" -and `$_.Name -ne `"DefaultAccount`"} | Enable-LocalUser"
-    wmic useraccount where name="Administrator" set disabled=true
+    echo "Get-WmiObject -Class Win32_UserAccount | ForEach-Object { if (`$_.Name -ne `"Guest`") { echo `"Enabling `$(`$_.Name)...`"; net user `$_.Name /active:yes } }"
 
     echo "`nGetting all local users..."
-    Get-LocalUser
+    Get-WmiObject -Class Win32_UserAccount | Select-Object *
 
     echo "`n******************** DISABLING ROLES AND FEATURES ********************`n"
 
     echo "`nDisabling SMB1..."
-    Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart
+    Set-SmbServerConfiguration -EnableSMB1Protocol $false -Force
 
     echo "`nDisabling RDP..."
     Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 1
@@ -65,27 +69,27 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
     Stop-Service Spooler
     Set-Service Spooler -StartupType Disabled -PassThru
 
-    echo "`n******************** DEFENDER AND ANTIVIRUS ********************`n"
+    #echo "`n******************** DEFENDER AND ANTIVIRUS ********************`n"
 
-    echo "`nUpdating signatures in new window..."
-    Start-Process powershell "echo 'Updating AV signatures...'; Update-MpSignature"
+    #echo "`nUpdating signatures in new window..."
+    #Start-Process powershell "echo 'Updating AV signatures...'; Update-MpSignature; pause"
 
-    echo "`nSetting protections on..."
-    Set-MpPreference -MAPSReporting Advanced
-    Set-MpPreference -SubmitSamplesConsent Always
-    Set-MpPreference -DisableBlockAtFirstSeen 0
-    Set-MpPreference -DisableIOAVProtection 0
-    Set-MpPreference -DisableRealtimeMonitoring 0
-    Set-MpPreference -DisableBehaviorMonitoring 0
-    Set-MpPreference -DisableScriptScanning 0
-    Set-MpPreference -DisableRemovableDriveScanning 0
-    Set-MpPreference -PUAProtection Enabled
-    Set-MpPreference -DisableArchiveScanning 0
-    Set-MpPreference -DisableEmailScanning 0
-    Set-MpPreference -CheckForSignaturesBeforeRunningScan 1
+    #echo "`nSetting protections on..."
+    #Set-MpPreference -MAPSReporting Advanced
+    #Set-MpPreference -SubmitSamplesConsent Always
+    #Set-MpPreference -DisableBlockAtFirstSeen 0
+    #Set-MpPreference -DisableIOAVProtection 0
+    #Set-MpPreference -DisableRealtimeMonitoring 0
+    #Set-MpPreference -DisableBehaviorMonitoring 0
+    #Set-MpPreference -DisableScriptScanning 0
+    #Set-MpPreference -DisableRemovableDriveScanning 0
+    #Set-MpPreference -PUAProtection Enabled
+    #Set-MpPreference -DisableArchiveScanning 0
+    #Set-MpPreference -DisableEmailScanning 0
+    #Set-MpPreference -CheckForSignaturesBeforeRunningScan 1
 
-    echo "`nGetting Defender and AV status"
-    Get-MpComputerStatus
+    #echo "`nGetting Defender and AV status"
+    #Get-MpComputerStatus
 
     echo "`n******************** FIREWALL ********************`n"
 
@@ -94,13 +98,13 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
 
     echo "`n******************** OPEN UPDATES ********************`n"
 
-    start ms-settings:windowsupdate
+    control update
 	
     echo "`n******************** SCHEDULE CHECKS TO RUN EVERY 15 MIN ********************`n"
 
-    Copy-Item -Path $PSScriptRoot\2016-Checks.ps1 -Destination C:\
+    Copy-Item -Path $PSScriptRoot\2012-Checks.ps1 -Destination C:\
     $taskTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $FREQ) -RepetitionDuration (New-TimeSpan -Days (365 * $FREQ))
-    $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-WindowStyle hidden -F C:\2016-Checks.ps1"
+    $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-WindowStyle hidden -F C:\2012-Checks.ps1"
 
     Register-ScheduledTask 'Run-Checks' -Action $taskAction -Trigger $taskTrigger
     Start-ScheduledTask 'Run-Checks'
