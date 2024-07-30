@@ -1,4 +1,4 @@
-powershell Set-ExecutionPolicy RemoteSigned
+powershell Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 
 FOR /F "tokens=2" %%g IN ('powershell $PSVersionTable ^| findstr /C:"PSVersion"') do (SET version=%%g)
 
@@ -60,4 +60,5 @@ IF %restart%==Yes (
 	shutdown -r -t 0
 )
 
+powershell Set-ExecutionPolicy -ExecutionPolicy Restricted
 pause
