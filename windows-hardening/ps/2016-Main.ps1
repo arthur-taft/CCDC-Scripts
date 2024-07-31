@@ -83,12 +83,17 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
 	echo "`n******************** OPEN UPDATES ********************`n"
 
 	start ms-settings:windowsupdate
+
+    echo "`n******************** SETTING CHECK BASELINES ********************`n"
+
+    echo "`nCreating log file..."
+    Start-process powershell "$PSScriptRoot\All-Checks.ps1 -b $true"
 	
     echo "`n******************** SCHEDULE CHECKS TO RUN EVERY 15 MIN ********************`n"
 
-    Copy-Item -Path $PSScriptRoot\2016-Checks.ps1 -Destination C:\
+    Copy-Item -Path $PSScriptRoot\All-Checks.ps1 -Destination C:\
     $taskTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $FREQ) -RepetitionDuration (New-TimeSpan -Days (365 * $FREQ))
-    $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-WindowStyle hidden -F C:\2016-Checks.ps1"
+    $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle hidden -F C:\All-Checks.ps1"
 
     Register-ScheduledTask 'Run-Checks' -Action $taskAction -Trigger $taskTrigger
     Start-ScheduledTask 'Run-Checks'

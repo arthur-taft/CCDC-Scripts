@@ -69,28 +69,6 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
     Stop-Service Spooler
     Set-Service Spooler -StartupType Disabled -PassThru
 
-    #echo "`n******************** DEFENDER AND ANTIVIRUS ********************`n"
-
-    #echo "`nUpdating signatures in new window..."
-    #Start-Process powershell "echo 'Updating AV signatures...'; Update-MpSignature; pause"
-
-    #echo "`nSetting protections on..."
-    #Set-MpPreference -MAPSReporting Advanced
-    #Set-MpPreference -SubmitSamplesConsent Always
-    #Set-MpPreference -DisableBlockAtFirstSeen 0
-    #Set-MpPreference -DisableIOAVProtection 0
-    #Set-MpPreference -DisableRealtimeMonitoring 0
-    #Set-MpPreference -DisableBehaviorMonitoring 0
-    #Set-MpPreference -DisableScriptScanning 0
-    #Set-MpPreference -DisableRemovableDriveScanning 0
-    #Set-MpPreference -PUAProtection Enabled
-    #Set-MpPreference -DisableArchiveScanning 0
-    #Set-MpPreference -DisableEmailScanning 0
-    #Set-MpPreference -CheckForSignaturesBeforeRunningScan 1
-
-    #echo "`nGetting Defender and AV status"
-    #Get-MpComputerStatus
-
     echo "`n******************** FIREWALL ********************`n"
 
     echo "`nEnabling Firewall...`n"
@@ -99,12 +77,18 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
     echo "`n******************** OPEN UPDATES ********************`n"
 
     control update
+
+    echo "`n******************** SETTING CHECK BASELINES ********************`n"
+
+    echo "`nCreating log file..."
+    Start-process powershell "$PSScriptRoot\All-Checks.ps1 -b $true"
 	
     echo "`n******************** SCHEDULE CHECKS TO RUN EVERY 15 MIN ********************`n"
 
-    Copy-Item -Path $PSScriptRoot\2012-Checks.ps1 -Destination C:\
+    Copy-Item -Path $PSScriptRoot\All-Checks.ps1 -Destination C:\
+    $FREQ = 15
     $taskTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $FREQ) -RepetitionDuration (New-TimeSpan -Days (365 * $FREQ))
-    $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-WindowStyle hidden -F C:\2012-Checks.ps1"
+    $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle hidden -F C:\All-Checks.ps1"
 
     Register-ScheduledTask 'Run-Checks' -Action $taskAction -Trigger $taskTrigger
     Start-ScheduledTask 'Run-Checks'
