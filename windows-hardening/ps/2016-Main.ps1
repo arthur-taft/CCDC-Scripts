@@ -15,6 +15,7 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
     echo "`nCreating new local user 'Printer'..."
     $Password = Read-Host "Enter the new password for Printer" -AsSecureString
     New-LocalUser -Name Printer -Password $Password
+    Add-LocalGroupMember -Group "Administrators" -Member "Printer"
 
     echo "`nDisabling all users except current and Printer..."
     Get-LocalUser | Where-Object {$_.Name -ne $Env:UserName -and $_.Name -ne "Printer"} | Disable-LocalUser
@@ -37,13 +38,6 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
     echo "`nDisabling Remote Management..."
     Disable-PSRemoting -Force
     Configure-SMremoting.exe -disable
-
-    echo "`n-Removing WinRM listeners..."
-    Remove-Item -Path WSMan:\Localhost\listener\listener* -Recurse -Force
-
-    echo "`n-Disabling WinRM firewall rules..."
-    Set-NetFirewallRule -DisplayName 'Windows Remote Management (HTTP-In)' -Enabled False -PassThru | Select -Property DisplayName, Profile, Enabled
-    Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\policies\system -Name LocalAccountTokenFilterPolicy -Value 0
 
     echo "`n-Stopping and disabling WinRM service..."
     Stop-Service WinRM

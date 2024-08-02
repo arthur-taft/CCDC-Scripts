@@ -26,6 +26,7 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
     echo "`nCreating new local user 'Printer'..."
     $Password = Read-Host "Enter the new password for Printer" -AsSecureString
     net user /add Printer ([Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)))
+    net localgroup administrators Printer /add
 
     echo "`nDisabling all users except current and Printer...`n"
     Get-WmiObject -Class Win32_UserAccount | ForEach-Object {
@@ -53,13 +54,6 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
     echo "`nDisabling Remote Management..."
     Disable-PSRemoting -Force
     Configure-SMremoting.exe -disable
-
-    echo "`n-Removing WinRM listeners..."
-    Remove-Item -Path WSMan:\Localhost\listener\listener* -Recurse -Force
-
-    echo "`n-Disabling WinRM firewall rules..."
-    Set-NetFirewallRule -DisplayName 'Windows Remote Management (HTTP-In)' -Enabled False -PassThru | Select -Property DisplayName, Profile, Enabled
-    Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\policies\system -Name LocalAccountTokenFilterPolicy -Value 0
 
     echo "`n-Stopping and disabling WinRM service..."
     Stop-Service WinRM

@@ -13,6 +13,10 @@ else {
 
 New-Item -Path $ROOT\$fileName -Force -ItemType "file"
 
+if (Test-Path -Path $ROOT\SMB-DIFFS.txt) {
+    Remove-Item $ROOT\SMB-DIFFS.txt
+}
+
 . {
     Get-SmbShare
     Get-SmbShare | Get-SmbShareAccess
@@ -22,5 +26,5 @@ New-Item -Path $ROOT\$fileName -Force -ItemType "file"
 if (-Not $BASE) {
     . {
         diff -DifferenceObject (Get-Content -Path $ROOT\$filename) -ReferenceObject (Get-Content -Path $ROOT\SMB-SHARES-BASELINE.txt)
-    } | Tee-Object $ROOT\SMB-DIFFS-$time.txt
+    } | Tee-Object $ROOT\SMB-DIFFS.txt
 }
