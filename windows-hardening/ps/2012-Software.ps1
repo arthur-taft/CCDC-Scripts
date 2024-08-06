@@ -1,5 +1,6 @@
 ﻿param($ROOT = "C:\Users\$Env:UserName\Desktop")
 
+$DOCS = "C:\Users\$Env:UserName\Documents"
 $LOGS = "$ROOT\PS-LOGS"
 
 $WAZUH_URL = "https://packages.wazuh.com/4.x/windows/wazuh-agent-4.8.0-1.msi"
@@ -34,9 +35,9 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
 
     echo "`n******************** DOWNLOADING AUTORUNS ********************`n"
 
-    wget $AUTORUNS_URL -OutFile $ROOT\autoruns.zip
+    wget $AUTORUNS_URL -OutFile $DOCS\autoruns.zip
     Add-Type -AssemblyName System.IO.Compression.FileSystem
-    [System.IO.Compression.ZipFile]::ExtractToDirectory("$ROOT\autoruns.zip", "$ROOT\autoruns")
+    [System.IO.Compression.ZipFile]::ExtractToDirectory("$DOCS\autoruns.zip", "$ROOT\autoruns")
 
     echo "`n******************** DOWNLOADING REGISTRY MANAGER ********************`n"
 

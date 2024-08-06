@@ -1,5 +1,6 @@
 ﻿param($ROOT = "C:\Users\$Env:UserName\Desktop")
 
+$DOCS = "C:\Users\$Env:UserName\Documents"
 $LOGS = "$ROOT\PS-LOGS"
 
 Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
@@ -21,30 +22,18 @@ Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
     Start-Sleep -Seconds 4
     NET START Wazuh
 
-    echo "`n******************** DOWNLOADING KF SENSOR HONEYPOT ********************`n"
+    echo "`n******************** DOWNLOADING KF SENSOR HONEYPOT INSTALLER ********************`n"
 
-    wget $KF_URL -OutFile "$ROOT\kfsense.msi"
+    wget $KF_URL -OutFile "$ROOT\kfsense-installer.msi"
 
     echo "`n******************** DOWNLOADING AUTORUNS ********************`n"
 
-    wget $AUTORUNS_URL -OutFile $ROOT\autoruns.zip
-    Expand-Archive -Path $ROOT\autoruns.zip -DestinationPath $ROOT\autoruns
+    wget $AUTORUNS_URL -OutFile $DOCS\autoruns.zip
+    Expand-Archive -Path $DOCS\autoruns.zip -DestinationPath $ROOT\autoruns
 
-    echo "`n******************** DOWNLOADING REGISTRY MANAGER ********************`n"
+    echo "`n******************** DOWNLOADING REGISTRY MANAGER INSTALLER ********************`n"
 
     wget $REG_MAN_URL -OutFile "$ROOT\regman-installer.exe"
-
-    echo "`n******************** DOWNLOADING AND INSTALLING SECURITY BASELINES AND TOOLS ********************`n"
-
-    wget $2016_BASELINE_URL -OutFile "$ROOT\2016-baseline-toolkit.zip"
-    Expand-Archive -Path $ROOT\2016-baseline-toolkit.zip -DestinationPath $ROOT\2016-baseline-toolkit
-
-    wget $LGPO_URL -OutFile "$ROOT\LGPO.zip"
-    Expand-Archive -Path $ROOT\LGPO.zip -DestinationPath $ROOT\LGPO
-
-    Copy-Item -Path $ROOT\LGPO\LGPO_30\LGPO.exe -Destination $ROOT\2016-baseline-toolkit\Windows-10-RS1-and-Server-2016-Security-Baseline\Local_Script\Tools\
-
-    Start-Process powershell $ROOT\2016-baseline-toolkit\Windows-10-RS1-and-Server-2016-Security-Baseline\Local_Script\Member_Server_Install.cmd
 
 } | Out-Default
 
