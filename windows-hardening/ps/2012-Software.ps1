@@ -4,8 +4,9 @@ $LOGS = "$ROOT\PS-LOGS"
 
 $WAZUH_URL = "https://packages.wazuh.com/4.x/windows/wazuh-agent-4.8.0-1.msi"
 $KF_URL = "https://www.kfsensor.net/kfsensor/download/kfsens40.msi"
-$REG_URL = "https://github.com/Seabreg/Regshot/raw/468afc89c23a539c8c555900cad1b4f1eb58e51f/Regshot-x64-ANSI.exe"
 $AUTORUNS_URL = "https://download.sysinternals.com/files/Autoruns.zip"
+$REG_MAN_URL = "https://www.resplendence.com/download/RegistrarHomeV9.exe"
+$CHROME_URL = "https://download.mozilla.org/?product=firefox-stub&os=win64&lang=en-US"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 echo "`nCreating log file..."
@@ -37,8 +38,8 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     [System.IO.Compression.ZipFile]::ExtractToDirectory("$ROOT\autoruns.zip", "$ROOT\autoruns")
 
-    echo "`n******************** DOWNLOADING REGSHOT ********************`n"
+    echo "`n******************** DOWNLOADING REGISTRY MANAGER ********************`n"
 
-    wget $REG_URL -OutFile "$ROOT\regshot.exe"
+    wget $REG_MAN_URL -OutFile "$ROOT\regman-installer.exe"
 
 } | Tee-Object $LOGS\PS-SOFTWARE-OUT.txt
