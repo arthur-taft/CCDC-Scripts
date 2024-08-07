@@ -59,6 +59,9 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
     Stop-Service WinRM
     Set-Service WinRM -StartupType Disabled -PassThru
 
+    echo "`n-Disabling WinRM firewall rules..."
+    Disable-NetFirewallRule -DisplayName "Windows Remote Management (HTTP-In)"
+
     echo "`nStopping and disabling Printer Spooler service..."
     Stop-Service Spooler
     Set-Service Spooler -StartupType Disabled -PassThru
