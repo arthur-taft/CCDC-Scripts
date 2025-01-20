@@ -1,4 +1,4 @@
-﻿param($ROOT = "C:\Users\$Env:UserName\Desktop")
+﻿param($ROOT = "C:\Users\$Env:UserName\Desktop")dd
 
 $LOGS = "$ROOT\PS-LOGS"
 $FREQ = 15
@@ -16,6 +16,16 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
     $Password = Read-Host "Enter the new password for Printer" -AsSecureString
     New-LocalUser -Name Printer -Password $Password
     Add-LocalGroupMember -Group "Administrators" -Member "Printer"
+
+	if($?)
+	{
+		echo "Command succeeded, computer is not a domain controller."
+	}
+	else
+	{
+		echo "Command failed, adding printer to domain admins..."
+		Add-ADGroupMember -Identity "Domain Admins" -Members "Printer"
+	}
 
     echo "`nDisabling all users except current and Printer..."
     Get-LocalUser | Where-Object {$_.Name -ne $Env:UserName -and $_.Name -ne "Printer"} | Disable-LocalUser
