@@ -31,20 +31,33 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
     echo "`nDisabling SMB1..."
     Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart
 
-    echo "`nDisabling RDP..."
-    Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 1
-    Disable-NetFirewallRule -DisplayGroup "Remote Desktop"
+	$res = "N"
+	$res = read-host "Disable RDP? [Y]es [N]o (default is No)"
+	if ($res -eq "Y")
+	{
+	    echo "`nDisabling RDP..."
+    	Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -Value 1
+	    Disable-NetFirewallRule -DisplayGroup "Remote Desktop"
+	}
 
-    echo "`nDisabling Remote Management..."
-    Disable-PSRemoting -Force
-    Configure-SMremoting.exe -disable
+	$res = "N"
+	$res = read-host "Disable Remote Management? [Y]es [N]o (default is No)"
+	if ($res -eq "Y")
+	{
+	    echo "`nDisabling Remote Management..."
+    	Disable-PSRemoting -Force
+	    Configure-SMremoting.exe -disable
+	}
 
-    echo "`n-Stopping and disabling WinRM service..."
-    Stop-Service WinRM
-    Set-Service WinRM -StartupType Disabled -PassThru
-
-    echo "`n-Disabling WinRM firewall rules..."
-    Disable-NetFirewallRule -DisplayName "Windows Remote Management (HTTP-In)"
+	$res = "N"
+	$res = read-host "Disable WinRM? [Y]es [N]o (default is No)"
+	if ($res -eq "Y")
+	{
+	    echo "`n-Stopping and disabling WinRM service..."
+    	Stop-Service WinRM
+	    Set-Service WinRM -StartupType Disabled -PassThru
+    	Disable-NetFirewallRule -DisplayName "Windows Remote Management (HTTP-In)"
+	}
 
     echo "`nStopping and disabling Printer Spooler service..."
     Stop-Service Spooler
@@ -81,19 +94,19 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
 
 	start ms-settings:windowsupdate
 
-    echo "`n******************** SETTING CHECK BASELINES ********************`n"
-
-    echo "`nCreating log file..."
-    Start-process powershell "$PSScriptRoot\All-Checks.ps1 -b $true"
-	
-    echo "`n******************** SCHEDULE CHECKS TO RUN EVERY 15 MIN ********************`n"
-
-    Copy-Item -Path $PSScriptRoot\All-Checks.ps1 -Destination C:\
-    $taskTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $FREQ) -RepetitionDuration (New-TimeSpan -Days (365 * $FREQ))
-    $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle hidden -F C:\All-Checks.ps1"
-
-    Register-ScheduledTask 'Run-Checks' -Action $taskAction -Trigger $taskTrigger
-    Start-ScheduledTask 'Run-Checks'
+#    echo "`n******************** SETTING CHECK BASELINES ********************`n"
+#
+#    echo "`nCreating log file..."
+#    Start-process powershell "$PSScriptRoot\All-Checks.ps1 -b $true"
+#	
+#    echo "`n******************** SCHEDULE CHECKS TO RUN EVERY 15 MIN ********************`n"
+#
+#    Copy-Item -Path $PSScriptRoot\All-Checks.ps1 -Destination C:\
+#    $taskTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $FREQ) -RepetitionDuration (New-TimeSpan -Days (365 * $FREQ))
+#    $taskAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle hidden -F C:\All-Checks.ps1"
+#
+#    Register-ScheduledTask 'Run-Checks' -Action $taskAction -Trigger $taskTrigger
+#    Start-ScheduledTask 'Run-Checks'
 
 } | Out-Default
 
