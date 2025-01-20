@@ -52,7 +52,7 @@ Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
 	echo "`n******************** DOWNLOADING AND INSTALLING HARDENINGKITTY********************`n"
 
 	InstallHardeningKitty
-	InvokeHardeningKitty -Mode Config -Backup
+	Invoke-HardeningKitty -Mode Config -Backup
 
 } | Out-Default
 

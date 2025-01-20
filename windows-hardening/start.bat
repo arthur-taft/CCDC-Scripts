@@ -17,18 +17,20 @@ ping 8.8.8.8
 ping amazon.com
 
 echo Download software?
-SET install=N
+SET install= N
 SET /p install="Yes[Y] No[N] (default is No)"
 
 IF %install%==Y (
+	powershell ps\2016-Software.ps1
+)
 ::	IF %version% LEQ 5.1 (
 ::		powershell ps\2012-Software.ps1
 ::	)
 ::
 ::	IF NOT %version% LSS 5.1 (
-		powershell ps\2016-Software.ps1
+::		powershell ps\2016-Software.ps1
 ::	)
-)
+::)
 
 powershell Set-ExecutionPolicy -ExecutionPolicy Restricted
 

