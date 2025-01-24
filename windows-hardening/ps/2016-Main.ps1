@@ -2,6 +2,8 @@
 
 $LOGS = "$ROOT\PS-LOGS"
 $FREQ = 15
+$title = "******** WARNING ********"
+$message = "This system is owned by a private organization and is intended solely for authorized users. By accessing this system, you agree to adhere to the company’s Acceptable Use Policy.`n`nAll actions on this system are subject to monitoring, recording, and review by authorized personnel for security reasons. Users should have no expectation of privacy while using this system.`n`nAny unauthorized or inappropriate use may lead to disciplinary measures or legal consequences. Continuing to use this system signifies your acknowledgment and acceptance of these terms and conditions."
 
 Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
 . {
@@ -103,6 +105,11 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
 	echo "`n******************** OPEN UPDATES ********************`n"
 
 	start ms-settings:windowsupdate
+
+	echo "`n******************** CHANGING LOGIN BANNER ********************`n"
+
+	Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "legalnoticecaption" -Value $title
+	Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "legalnoticetext" -Value $message
 
 #    echo "`n******************** SETTING CHECK BASELINES ********************`n"
 #
