@@ -1,15 +1,15 @@
-### Introduction
+## Introduction
 
 This dir is for windows hardening scripts. A couple of quick notes:
 - This script only supports Windows Server 2016 or above (Windows 10 or later equivalent) currently
 - Entrypoint is start.bat
 - The powershell scripts may be blocked by execution policy. There have been several measures taken to eliminate this error, but they work on some machines and not others. If the scripts get blocked, changing something small, saving the file, and changing it back should get around execution policy
 
-### Installation
+## Installation
 
 Installing and running is as simple as getting a copy of this repo and running start.bat.
 
-##### Quick Install
+### Quick Install
 Run these commands in powershell:
 ```
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;
@@ -23,7 +23,7 @@ cd Useful-Scripts\windows-hardening;
 .\start.bat;
 ```
 
-### Features
+## Features
 - Enables Firewall, Windows Defender, and Windows Update
 - Changes current user's password and creates a backup user 'printer'
 - Disables insecure protocols and services such as SMBv1, RDP, and the Printer Spooler Service
