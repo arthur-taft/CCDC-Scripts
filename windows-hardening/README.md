@@ -19,7 +19,7 @@ Expand-Archive -Path Useful-Scripts.zip -DestinationPath Useful-Scripts;
 
 Start the script with:
 ```
-cd Useful-Scripts\windows-hardening;
+cd Useful-Scripts\Useful-Scripts-main\windows-hardening\;
 .\start.bat;
 ```
 
