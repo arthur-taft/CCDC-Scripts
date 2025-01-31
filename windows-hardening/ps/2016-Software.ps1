@@ -33,7 +33,7 @@ Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
     Expand-Archive -Path $DOCS\sysinternals.zip -DestinationPath $ROOT\sysinternals
 
     echo "`n******************** DOWNLOADING WORMHOLE ********************`n"
-	wget $WORMHOLE_URL -OutFile $DOCS\wormhole.exe
+	wget $WORMHOLE_URL -OutFile $ROOT\wormhole.exe
 
 } | Out-Default
 
