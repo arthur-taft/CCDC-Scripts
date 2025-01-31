@@ -2,7 +2,11 @@ import pyautogui
 import tkinter
 import time
 
-time.sleep(5)
+# Count down
+for i in range(5):
+    print(5 - i)
+    time.sleep(1)
+
 
 clipboard_content = tkinter.Tk().clipboard_get()
 
