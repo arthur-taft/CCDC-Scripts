@@ -5,3 +5,9 @@ This repo contains scripts built for a certain competition which will not be nam
 For installation and usage:
 <!-- - [copy-paster](https://github.com/archHavik/Useful-Scripts/tree/main/copy-paster)-->
 - [windows-hardening](https://github.com/archHavik/Useful-Scripts/tree/main/windows-hardening)
+
+Below are some documents the team uses during the competition.
+- [Playbook](https://docs.google.com/document/d/1QzDyOhOTdJksMyCPqkkeYsSK8IKx8IlWvpEHrRR_CoI/edit?tab=t.0#heading=h.7h1mpiksafzw)
+- Templates
+	- [Memorandum](https://docs.google.com/document/d/1go2NHxtC_7yg6LjmxMHuWh5JbEXScPSCv86YSRJB_wU/edit?tab=t.0)
+	- [Interoffice Memorandum](https://docs.google.com/document/d/1nNBKjexrjk-xHNmuo2qte9WE5aBssyXeTWEChmwtyKA/edit?tab=t.0)

@@ -29,11 +29,11 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
 		Add-ADGroupMember -Identity "Domain Admins" -Members "Printer"
 	}
 
-    echo "`nDisabling all users except current and Printer..."
-    Get-LocalUser | Where-Object {$_.Name -ne $Env:UserName -and $_.Name -ne "Printer"} | Disable-LocalUser
+    #echo "`nDisabling all users except current and Printer..."
+    #Get-LocalUser | Where-Object {$_.Name -ne $Env:UserName -and $_.Name -ne "Printer"} | Disable-LocalUser
 
-    echo "`nTo re-enable all users use this command:"
-    echo "Get-LocalUser | Where-Object {`$_.Name -ne `"Guest`" -and `$_.Name -ne `"DefaultAccount`"} | Enable-LocalUser"
+    #echo "`nTo re-enable all users use this command:"
+    #echo "Get-LocalUser | Where-Object {`$_.Name -ne `"Guest`" -and `$_.Name -ne `"DefaultAccount`"} | Enable-LocalUser"
 
     echo "`nGetting all local users..."
     Get-LocalUser
