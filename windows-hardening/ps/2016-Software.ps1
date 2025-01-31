@@ -14,6 +14,7 @@ Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
     $LGPO_URL = "https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/LGPO.zip"
     $POLICYANALYZER_URL = "https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/PolicyAnalyzer.zip"
 	$WORMHOLE_URL = "https://github.com/aquacash5/magic-wormhole-exe/releases/download/0.17.0/wormhole.exe"
+	$SHARPHOUND_URL = "https://github.com/SpecterOps/SharpHound/releases/download/v2.5.13/SharpHound-v2.5.13.zip"
 
     echo "`n******************** DOWNLOADING AND INSTALLING WAZUH AGENT ********************`n"
 
@@ -34,6 +35,10 @@ Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
 
     echo "`n******************** DOWNLOADING WORMHOLE ********************`n"
 	wget $WORMHOLE_URL -OutFile $ROOT\wormhole.exe
+
+    echo "`n******************** DOWNLOADING SHARPHOUND ********************`n"
+	wget $SHARPHOUND_URL -Outfile $DOCS\sharphound.zip
+    Expand-Archive -Path $DOCS\sharphound.zip -DestinationPath $ROOT\sharphound
 
 } | Out-Default
 
