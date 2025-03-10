@@ -18,6 +18,8 @@ if [[ -z "$package_manager" ]]; then
     exit 1
 fi
 
+Nic="$(ip -o -4 route show to default | awk '{print $5}')"
+
 # yum install
 yum_install(){
     # Import the GPG key:
@@ -36,10 +38,30 @@ EOF
 
     # Install the Wazuh agent:
     WAZUH_MANAGER="$Wazuh_IP" yum install wazuh-agent
+
+	# Enable and start the agent:
+	systemctl daemon-reload
+	systemctl enable wazuh-agent
+	systemctl start wazuh-agent
+
+	# Install dependencies for Suricata:
+	yum install epel-release yum-plugin-copr
+
+	# Add the repo:
+	yum copr enable @oisf/suricata-7.0
+
+	# Install suricata:
+	yum install suricata
+
+	# Reconfigure suricata service to use the updated nic:
+	sed -i "s/eth0/$Nic/" /etc/sysconfig/suricata
 }
 
 # apt install
 apt_install(){
+	# Install curl
+	apt -y install curl
+
     # Install the GPG key:
     curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
 
@@ -51,6 +73,18 @@ apt_install(){
 
     # Install the Wazuh agent:
     WAZUH_MANAGER="$Wazuh_IP" apt-get install wazuh-agent
+
+	# Enable and start the agent:
+	systemctl daemon-reload
+	systemctl enable wazuh-agent
+	systemctl start wazuh-agent
+
+	# Add the repo:
+	add-apt-repository ppa:oisf/suricata-stable
+
+	# Install suricata:
+	apt update
+	apt install suricata
 }
 
 # zypper install
@@ -91,3 +125,20 @@ case "$package_manager" in
         exit 1
         ;;
 esac
+
+# Add the correct interface for suricata:
+sed -i "s/interface: eth0/interface: $Nic/g" /etc/suricata/suricata.yaml
+
+# Update rules and restart:
+suricata-update
+systemctl restart suricata
+
+# Update the ossec.conf to ingest suricata logs:
+cat >> /var/ossec/etc/ossec.conf << EOF
+<ossec_config>
+  <localfile>
+    <log_format>json</log_format>
+    <location>/var/log/suricata/eve.json</location>
+  </localfile>
+</ossec_config>
+EOF

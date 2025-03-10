@@ -13,6 +13,7 @@ Installing and running is as simple as getting a copy of this repo and running s
 Run these commands in powershell:
 ```
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;
+$ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest https://github.com/archHavik/Useful-Scripts/archive/refs/heads/main.zip -Outfile Useful-Scripts.zip;
 Expand-Archive -Path Useful-Scripts.zip -DestinationPath Useful-Scripts;
 ```
