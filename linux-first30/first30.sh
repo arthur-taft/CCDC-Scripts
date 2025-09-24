@@ -27,9 +27,7 @@ while (( break_while == 0 )); do
 
 done
 
-OS=$(#!/usr/bin/env bash
-
-os_name() {
+function os_name() {
     if [ -f /etc/os-release ]; then
         # freedesktop.org and systemd
         . /etc/os-release
@@ -55,35 +53,36 @@ os_name() {
     fi
 }
 
-os_name_result=$(os_name)
-echo "$os_name_result")
+OS=$(os_name)
 
-package_manager=$(#!/usr/bin/env bash
+function check_package_manager() {
 
-# Get the OS name lowercase
-OS="$OS"
-if [[ -z "$OS" ]]; then
-    echo "Error: No OS name provided to remove_package."
-    exit 1
-fi
+    OS="$OS"
+    if [[ -z "$OS" ]]; then
+        echo "Error: No OS name provided to remove_package."
+        exit 1
+    fi
 
-case "$OS" in
-    ubuntu|debian)
-        echo "apt"
-        ;;
-    centos|rocky|almalinux|fedora)
-        echo "yum"
-        ;;
-    arch)
-        echo "pacman"
-        ;;
-    opensuse*)
-        echo "zypper"
-        ;;
-    *)
-        echo "unsupported"
-        ;;
-esac)
+    case "$OS" in
+        ubuntu|debian)
+            echo "apt"
+            ;;
+        centos|rocky|almalinux|fedora)
+            echo "yum"
+            ;;
+        arch)
+            echo "pacman"
+            ;;
+        opensuse*)
+            echo "zypper"
+            ;;
+        *)
+            echo "unsupported"
+            ;;
+    esac
+}
+
+package_manager=$(check_package_manager)
 
 function remove_package() {
     local package_manager="$1"
@@ -238,7 +237,7 @@ function setup_firewall() {
                 nft list ruleset > /etc/nftables.conf
             fi
             ;; 
-        fedora linux)
+        fedora)
             if (( $VER < 32 )); then
                 firewall-cmd --state
                 firewall-cmd --lsit-all-zones
