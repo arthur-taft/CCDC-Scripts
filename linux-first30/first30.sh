@@ -59,6 +59,8 @@ OS=${OS,,}
 
 if [ "$OS" -eq "ubuntu" ]; then
     VER="${VER::-3}"
+elif [[ $OS =~ "fedora" ]]; then
+    OS="fedora"
 fi
 
 function check_package_manager() {
