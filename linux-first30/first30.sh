@@ -53,7 +53,13 @@ function os_name() {
     fi
 }
 
-OS=$(os_name)
+os_name
+
+OS=${OS,,}
+
+if [ "$OS" -eq "ubuntu" ]; then
+    VER="${VER::-3}"
+fi
 
 function check_package_manager() {
 
@@ -200,7 +206,7 @@ function run_nmap() {
 function setup_firewall() {
     case "$OS" in
         ubuntu)
-            if (( $VER < 20.04 )); then
+            if (( $VER < 20 )); then
                 ufw status
                 ufw status verbose
                 ufw default deny incoming
@@ -208,7 +214,7 @@ function setup_firewall() {
                 ufw allow 80/tcp
                 ufw deny out 25/tcp
                 ufw enable
-            elif (( $VER >= 20.04 )); then
+            elif (( $VER >= 20 )); then
                 nft list ruleset
                 nft add table inet filter
                 nft add chain inet filter input { type filter hook input priority 0 \; policy drop\; }
@@ -275,6 +281,8 @@ function second_backup() {
 }
 
 function download_and_run_script() {
+    install_package "$package_manager" "curl"
+
     curl -O https://github.com/SUU-Cybersecurity-Club/CCDC-Scripts/releases/latest/linux-hardening.tar.xz linux-hardening.tar.xz
     tar -xpf linux-hardening.tar.xz
     cd linux-hardening
