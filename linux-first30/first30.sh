@@ -96,6 +96,10 @@ package_manager=$(check_package_manager)
 
 export package_manager
 
+read -p "Enter Wazuh manager IP: " wazuh_ip
+
+wazuh_command="bash linux_wazuh_agent.sh $wazuh_ip $package_manager"
+
 function remove_package() {
     local package_manager="$1"
     if [[ -z "$package_manager" ]]; then
@@ -312,12 +316,40 @@ function download_and_run_script() {
     bash start.sh
 }
 
-etc_backup
+function setup_tmux() {
+    install_package "$package_manager" "tmux"
 
-ssh_backup_and_remove
+    tmux new-session -d -s start \; \
+        # Create 'user' tab
+        tmux rename-window -t start:0 user \; \
+        split-window -h \; \
+        # Create 'banner' tab
+        tmux new-window -t start:1 -n 'banner' \; \
+        split-window \; \
+        split-window \; \
+        select-pane -t 0 \; \
+        send-keys 'vim /etc/ssh/sshd_config' C-m \; \
+        select-pane -t 1 \; \
+        send-keys 'vim /etc/issue.net' C-m \; \
+        select-pane -t 2 \; \
+        send-keys 'Banner /etc/issue.net in config and write issue' \; \
+        # Create 'script-tasks' tab
+        tmux new-window -t start:2 -n 'script-tasks' \; \
+        split-window -h \; \
+        select-pane -t 0 \; \
+        send-keys 'bash -c "etc_backup"' C-m \; \
+        select-pane -t 1 \; \
+        send-keys 'bash -lc "ssh_backup_and_remove && run_nmap && setup_firewall && tmux wait-for -S tasks-done"' C-m \; \
+        wait-for tasks-done \; \
+        select-pane -t 0 \; \
+        send-keys 'bash -c "second_backup"' C-m \; \
+        # Create 'install' tab
+        tmux new-window -t start:3 -n 'install' \; \
+        send-keys "$wazuh_command" C-m \; \
+        # Set focus on the 'install' window and left pane
+        tmux select-window -t start:0 \; \
+        select-pane -t 0 \; \
+        attach-session -t start 
+}
 
-run_nmap
-
-setup_firewall
-
-second_backup
+setup_tmux
