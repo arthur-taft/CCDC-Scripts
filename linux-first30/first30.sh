@@ -129,7 +129,7 @@ function remove_package() {
             ;;
         yum)
             echo "Using yum to remove $package_name..."
-            yum erase -y "$package_name"
+            yum remove -y "$package_name"
             ;;
         pacman)
             echo "Using pacman to remove $package_name..."
@@ -317,6 +317,7 @@ function download_and_run_script() {
 }
 
 function setup_tmux() {
+    install_package "$package_manager" "vim"
     install_package "$package_manager" "tmux"
 
     tmux new-session -d -s start \; \
