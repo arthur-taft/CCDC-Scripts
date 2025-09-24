@@ -5,6 +5,28 @@ if (( $EUID != 0 )); then
     exit 1
 fi
 
+break_while=0
+
+while (( break_while == 0 )); do
+
+    read -p "Have you changed the root pw and added a backup user? (y/n): " pw_check
+
+    case "$pw_check" in
+        y)
+            echo "Good job! :)"
+            break
+            ;;
+        n)
+            echo "Go do that! >:("
+            exit 1
+            ;;
+        *)
+            echo "Response has got to be 'y' or 'n' buddy"
+            ;;
+    esac
+
+done
+
 OS=$(#!/usr/bin/env bash
 
 os_name() {
@@ -103,7 +125,53 @@ function remove_package() {
             zypper remove -y "$package_name"
             ;;
         *)
-            echo "Error: Unsupported package manager."
+            echo "Unsupported package manager :("
+            exit 1
+            ;;
+    esac
+}
+
+function install_package() {
+    local package_manager="$1"
+    if [[ -z "$package_manager" ]]; then
+        echo "Error: No package manager provided to install package :("
+        exit 1
+    fi
+
+    local package_name="$2"
+    if [[ -z "$package_name" ]]; then
+        echo "Error: No package name provided to install package :("
+        exit 1
+    fi
+
+    if [[ "$package_manager" == "unsupported" ]]; then
+        echo "Error: Unsupported operating system :("
+        exit 1
+    fi
+
+    case "$package_manager" in
+        apt)
+            echo "Using apt to install $package_name..."
+            apt update && apt install -y "$package_name"
+            ;;
+        dnf)
+            echo "Using dnf to install $package_name..."
+            dnf install -y "$package_name"
+            ;;
+        yum)
+            echo "Using yum to install $package_name..."
+            yum install -y "$package_name"
+            ;;
+        pacman)
+            echo "Using pacman to install $package_name..."
+            pacman -Syu --noconfirm "$package_name"
+            ;;
+        zypper)
+            echo "Using zypper to install $package_name..."
+            zypper install -y "$package_name"
+            ;;
+        *)
+            echo "Unsupported package manager :("
             exit 1
             ;;
     esac
@@ -124,25 +192,107 @@ function ssh_backup_and_remove() {
     remove_package "$package_manager" "openssh-server"
 }
 
-break_while=0
+function run_nmap() {
+    install_package "$package_manager" "nmap"
 
-while (( break_while == 0 )); do
+    nmap -sV -T4 -p- localhost 2>&1| tee nmap.txt
+}
 
-    read -p "Have you changed the root pw and added a backup user? (y/n): " pw_check
-
-    case "$pw_check" in
-        y)
-            echo "Good job! :)"
-            break
+function setup_firewall() {
+    case "$OS" in
+        ubuntu)
+            if (( $VER < 20.04 )); then
+                ufw status
+                ufw status verbose
+                ufw default deny incoming
+                ufw allow 80
+                ufw allow 80/tcp
+                ufw deny out 25/tcp
+                ufw enable
+            elif (( $VER >= 20.04 )); then
+                nft list ruleset
+                nft add table inet filter
+                nft add chain inet filter input { type filter hook input priority 0 \; policy drop\; }
+                nft add chain inet filter output { type filter hook output priority 0 \; policy accept \; }
+                nft add rule inet filter input tcp dport 80 accept
+                nft add rule inet filter output tcp dport 25 drop
+                nft list ruleset > /etc/nftables.conf
+            fi
             ;;
-        n)
-            echo "Go do that! >:("
-            exit 1
+        debian)
+            if (( $VER < 10 )); then
+                ufw status
+                ufw status verbose
+                ufw default deny incoming
+                ufw allow 80
+                ufw allow 80/tcp
+                ufw deny out 25/tcp
+                ufw enable
+            elif (( $VER >= 10 )); then
+                nft list ruleset
+                nft add table inet filter
+                nft add chain inet filter input { type filter hook input priority 0 \; policy drop\; }
+                nft add chain inet filter output { type filter hook output priority 0 \; policy accept \; }
+                nft add rule inet filter input tcp dport 80 accept
+                nft add rule inet filter output tcp dport 25 drop
+                nft list ruleset > /etc/nftables.conf
+            fi
+            ;; 
+        fedora linux)
+            if (( $VER < 32 )); then
+                firewall-cmd --state
+                firewall-cmd --lsit-all-zones
+                firewall-cmd --set-target=DROP --permanent
+                firewall-cmd --add-port=80/tcp --permanent
+                firewall-cmd --add-service=http --permanent
+                firewall-cmd --add-rich-rule='rule family="ipv4" destination port=25 protocol=tcp reject' --permanent
+                firewall-cmd --reload
+            elif (( $VER >= 32 )); then
+                nft list ruleset
+                nft add table inet filter
+                nft add chain inet filter input { type filter hook input priority 0 \; policy drop\; }
+                nft add chain inet filter output { type filter hook output priority 0 \; policy accept \; }
+                nft add rule inet filter input tcp dport 80 accept
+                nft add rule inet filter output tcp dport 25 drop
+                nft list ruleset > /etc/nftables.conf
+            fi
             ;;
-        *)
-            echo "Response has got to be 'y' or 'n' buddy"
+        centos)
+            firewall-cmd --state
+            firewall-cmd --lsit-all-zones
+            firewall-cmd --set-target=DROP --permanent
+            firewall-cmd --add-port=80/tcp --permanent
+            firewall-cmd --add-service=http --permanent
+            firewall-cmd --add-rich-rule='rule family="ipv4" destination port=25 protocol=tcp reject' --permanent
+            firewall-cmd --reload           
             ;;
     esac
+}
 
-done
+function second_backup() {
+    cd /
+    tar -cf ettc2 /etc
+    mv ettc2 /boot
+}
 
+function download_and_run_script() {
+    curl -O https://github.com/SUU-Cybersecurity-Club/CCDC-Scripts/releases/latest/linux-hardening.tar.xz linux-hardening.tar.xz
+    tar -xpf linux-hardening.tar.xz
+    cd linux-hardening
+
+    chmod +x start.sh linux_wazuh_agent.sh
+
+    bash start.sh
+}
+
+etc_backup
+
+ssh_backup_and_remove
+
+run_nmap
+
+setup_firewall
+
+second_backup
+
+download_and_run_script
