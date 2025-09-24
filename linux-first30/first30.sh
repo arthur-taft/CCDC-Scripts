@@ -63,6 +63,8 @@ elif [[ "$OS" =~ "fedora" ]]; then
     OS="fedora"
 fi
 
+export OS VER
+
 function check_package_manager() {
 
     OS="$OS"
@@ -91,6 +93,8 @@ function check_package_manager() {
 }
 
 package_manager=$(check_package_manager)
+
+export package_manager
 
 function remove_package() {
     local package_manager="$1"
@@ -138,6 +142,8 @@ function remove_package() {
     esac
 }
 
+export -f remove_package
+
 function install_package() {
     local package_manager="$1"
     if [[ -z "$package_manager" ]]; then
@@ -184,11 +190,15 @@ function install_package() {
     esac
 }
 
+export -f install_package
+
 function etc_backup() {
     cd /
     tar -cf ettc etc
     mv ettc /boot
 }
+
+export -f etc_backup
 
 function ssh_backup_and_remove() {
     if [ -e "/root/.ssh" ]; then
@@ -199,11 +209,15 @@ function ssh_backup_and_remove() {
     remove_package "$package_manager" "openssh-server"
 }
 
+export -f ssh_backup_and_remove
+
 function run_nmap() {
     install_package "$package_manager" "nmap"
 
     nmap -sV -T4 -p- localhost 2>&1| tee nmap.txt
 }
+
+export -f run_nmap
 
 function setup_firewall() {
     case "$OS" in
@@ -276,11 +290,15 @@ function setup_firewall() {
     esac
 }
 
+export -f setup_firewall
+
 function second_backup() {
     cd /
     tar -cf ettc2 /etc
     mv ettc2 /boot
 }
+
+export -f second_backup
 
 function download_and_run_script() {
     install_package "$package_manager" "curl"
@@ -303,5 +321,3 @@ run_nmap
 setup_firewall
 
 second_backup
-
-download_and_run_script
