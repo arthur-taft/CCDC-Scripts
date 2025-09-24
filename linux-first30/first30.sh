@@ -55,11 +55,11 @@ function os_name() {
 
 os_name
 
-OS=${OS,,}
+OS="${OS,,}"
 
-if [ "$OS" -eq "ubuntu" ]; then
+if [ "$OS" = "ubuntu" ]; then
     VER="${VER::-3}"
-elif [[ $OS =~ "fedora" ]]; then
+elif [[ "$OS" =~ "fedora" ]]; then
     OS="fedora"
 fi
 
