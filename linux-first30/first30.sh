@@ -11,7 +11,7 @@ while (( break_while == 0 )); do
 
     read -p "Have you changed the root pw and added a backup user? (y/n): " pw_check
 
-    case "$pw_check" in
+    case "${pw_check,,}" in
         y)
             echo "Good job! :)"
             break
