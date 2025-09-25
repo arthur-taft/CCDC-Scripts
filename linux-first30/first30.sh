@@ -55,11 +55,14 @@ function os_name() {
 
 os_name
 
+# Force lowercase
 OS="${OS,,}"
 
 if [ "$OS" = "ubuntu" ]; then
+    # Fix version to work with integer comparison
     VER="${VER::-3}"
 elif [[ "$OS" =~ "fedora" ]]; then
+    # Shorten Fedora Linux to fedora
     OS="fedora"
 fi
 
@@ -225,6 +228,7 @@ export -f run_nmap
 
 function setup_firewall() {
     case "$OS" in
+    # Check version of os to use best firewall daemon
         ubuntu)
             if (( $VER < 20 )); then
                 ufw status
@@ -296,6 +300,19 @@ function setup_firewall() {
 
 export -f setup_firewall
 
+function check_cron() {
+    crontab -e
+}
+
+export -f check_cron
+
+function check_cron_py() {
+    install_package "$package_manager" "python3"
+    ./check_cron.py
+}
+
+export -f check_cron_py
+
 function second_backup() {
     cd /
     tar -cf ettc2 /etc
@@ -303,18 +320,6 @@ function second_backup() {
 }
 
 export -f second_backup
-
-function download_and_run_script() {
-    install_package "$package_manager" "curl"
-
-    curl -O https://github.com/SUU-Cybersecurity-Club/CCDC-Scripts/releases/latest/linux-hardening.tar.xz linux-hardening.tar.xz
-    tar -xpf linux-hardening.tar.xz
-    cd linux-hardening
-
-    chmod +x start.sh linux_wazuh_agent.sh
-
-    bash start.sh
-}
 
 function setup_tmux() {
     install_package "$package_manager" "vim"
@@ -347,6 +352,13 @@ function setup_tmux() {
         # Create 'install' tab
         tmux new-window -t start:3 -n 'install' \; \
         send-keys "$wazuh_command" C-m \; \
+        # Create 'cron' tab
+        tmux new-window -t start:4 -n 'cron' \; \
+        split-window -h \; \
+        select-pane -t 0 \; \
+        send-keys 'bash -c "check_cron"' \; \
+        select-pane -t 1 \; \
+        send-keys 'bash -c "check_cron_py"' \; \
         # Set focus on the 'install' window and left pane
         tmux select-window -t start:0 \; \
         select-pane -t 0 \; \
