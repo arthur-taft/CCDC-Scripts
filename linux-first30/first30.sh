@@ -299,7 +299,7 @@ export -f setup_firewall
 function second_backup() {
     cd /
     tar -cf ettc2 /etc
-    mv ettc2 /boot
+    mv ettc2 /usr/src/linux
 }
 
 export -f second_backup
