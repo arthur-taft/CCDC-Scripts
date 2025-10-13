@@ -113,7 +113,7 @@ function create_backup_usr() {
 
     echo "Password for user $backup_usr will be set in the next step"
 }
- 
+
 function second_pass_update() {
     declare -a pass_update_users
 
@@ -159,3 +159,67 @@ function interface_up() {
     done
 }
 
+function os_name() {
+    if [ -f /etc/os-release ]; then
+        # freedesktop.org and systemd
+        . /etc/os-release
+        OS=$NAME
+        VER=$VERSION_ID
+    elif type lsb_release > /dev/null 2>&1; then
+        # linuxbase.org
+        OS=$(lsb_release -si)
+        VER=$(lsb_release -sr)
+    elif [ -f /etc/lsb-release ]; then
+        # For some versions of Debian/Ubuntu without lsb_release command
+        . /etc/lsb-release
+        OS=$DISTRIB_ID
+        VER=$DISTRIB_RELEASE
+    elif [ -f /etc/debian_version ]; then
+        # Older Debian/Ubuntu/etc.
+        OS=Debian
+        VER=$(cat /etc/debian_version)
+    else
+        # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
+        OS=$(uname -s)
+        VER=$(uname -r)
+    fi
+}
+
+os_name
+
+OS="${OS,,}"
+
+if [ "$OS" = "ubuntu" ]; then
+    # Fix version to work with integer comparison
+    VER="${VER::-3}"
+elif [[ "$OS" =~ "fedora" ]]; then
+    # Shorten Fedora Linux to fedora
+    OS="fedora"
+fi
+
+function check_package_manager() {
+    if [[ -z "$OS" ]]; then
+        echo "Error: No OS name provided to remove_package."
+        exit 1
+    fi
+
+    case "$OS" in
+        ubuntu|debian)
+            echo "apt"
+            ;;
+        centos|rocky|almalinux|fedora)
+            echo "yum"
+            ;;
+        arch)
+            echo "pacman"
+            ;;
+        opensuse*)
+            echo "zypper"
+            ;;
+        *)
+            echo "unsupported"
+            ;;
+    esac
+}
+
+package_manager=$(check_package_manager)
