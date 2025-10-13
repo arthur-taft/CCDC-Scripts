@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function interface_up() {
     for iface in "$@"; do
         if [ "$iface" = "lo" ]; then
