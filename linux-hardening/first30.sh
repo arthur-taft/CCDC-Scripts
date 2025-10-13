@@ -5,12 +5,17 @@ if (( EUID != 0 )); then
     exit 1
 fi
 
+acct_bak_count=0 
+etc_bak_count=0
+
 function backup_group_passwd_shadow() {
-    tar -cJf /root/group_passwd.tar.xz /etc/group /etc/passwd /etc/shadow
+    tar -cJf /root/group_passwd_shadow_bak_"$acct_bak_count".tar.xz /etc/group /etc/passwd /etc/shadow
+    ((acct_bak_count++))
 }
 
 function backup_etc() {
-    tar -cJf /root/ettc.tar.xz /etc 
+    tar -cJf /root/etc_bak_"$etc_bak_count".tar.xz /etc 
+    ((etc_bak_count++))
 }
 
 function update_user_pass() {
@@ -59,6 +64,7 @@ function service_backup() {
     chmod 600 /root/b
 
     tar -cJf /root/b/etc_bak.tar.xz /etc
+    ((etc_bak_count++))
 
     tar -cJf /root/b/web_bak.tar.xz /var/www/html
 
@@ -142,3 +148,14 @@ function nuke_cron() {
     tar -cJf /root/b/cron_bak.tar.xz /var/spool/cron/*
     rm -f /var/spool/cron/*
 }
+
+function interface_up() {
+    for iface in "${interfaces[@]}"; do
+        if [ "$iface" = "lo" ]; then
+            echo "Don't touch the loopback device"
+        else
+            ip link set "$iface" up
+        fi
+    done
+}
+
