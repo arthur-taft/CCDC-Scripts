@@ -10,5 +10,3 @@ function interface_down() {
         fi
     done
 }
-
-interface_down "$1"

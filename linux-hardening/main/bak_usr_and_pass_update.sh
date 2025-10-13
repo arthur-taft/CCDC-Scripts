@@ -47,7 +47,3 @@ function second_pass_update() {
         echo "$user:$new_pass" | chpasswd &>/dev/null
     done
 }
-
-create_backup_usr
-
-second_pass_update
