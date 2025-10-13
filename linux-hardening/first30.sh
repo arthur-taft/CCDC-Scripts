@@ -5,8 +5,8 @@ if (( EUID != 0 )); then
     exit 1
 fi
 
-function backup_group_passwd() {
-    tar -cJf /root/group_passwd.tar.xz /etc/group /etc/passwd
+function backup_group_passwd_shadow() {
+    tar -cJf /root/group_passwd.tar.xz /etc/group /etc/passwd /etc/shadow
 }
 
 function backup_etc() {
@@ -118,6 +118,7 @@ function second_pass_update() {
         echo "Password text entered will not be echoed to the terminal"
         
         while :; do
+            # -rs preserves backslashes and reads as a secure string
             read -rs "Enter the new password for $user: " new_pass
             read -rs "Enter password again: " new_pass_again
 
@@ -131,4 +132,13 @@ function second_pass_update() {
 
         echo "$user:$new_pass" | chpasswd &>/dev/null
     done
+}
+
+function nuke_cron() {
+    # Comment out every line but the first three
+    sed -i '4,${/^[[:space:]]*$/! s/^/#/}' /etc/crontab
+
+    # Backup, then nuke user crons
+    tar -cJf /root/b/cron_bak.tar.xz /var/spool/cron/*
+    rm -f /var/spool/cron/*
 }
