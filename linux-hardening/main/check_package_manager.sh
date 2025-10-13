@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function check_package_manager() {
     if [[ -z "$OS" ]]; then
         echo "Error: No OS name provided to remove_package."

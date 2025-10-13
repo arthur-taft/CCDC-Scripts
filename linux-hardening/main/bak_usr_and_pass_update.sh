@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function create_backup_usr() {
     while :; do
         read -rp "What do you want the backup user to be named?: " backup_usr

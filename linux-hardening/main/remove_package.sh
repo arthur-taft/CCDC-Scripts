@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function remove_package() {
     local package_manager="$1"
     if [[ -z "$package_manager" ]]; then

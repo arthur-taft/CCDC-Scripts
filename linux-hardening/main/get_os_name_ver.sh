@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function get_os_name_ver() {
     if [ -f /etc/os-release ]; then
         # freedesktop.org and systemd

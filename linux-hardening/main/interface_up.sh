@@ -1,7 +1,5 @@
 function interface_up() {
-    interfaces=$1
-
-    for iface in "${interfaces[@]}"; do
+    for iface in "$@"; do
         if [ "$iface" = "lo" ]; then
             echo "Don't touch the loopback device"
         else

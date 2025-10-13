@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function update_user_pass() {
     if [ -f /root/passupdate ]; then
         echo "Passwords have been updated. Skipping..."

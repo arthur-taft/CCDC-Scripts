@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function nuke_cron() {
     # Comment out every line but the first three
     sed -i '4,${/^[[:space:]]*$/! s/^/#/}' /etc/crontab
