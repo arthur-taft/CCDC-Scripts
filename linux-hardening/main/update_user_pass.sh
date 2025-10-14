@@ -22,7 +22,7 @@ function update_user_pass() {
     fi
 
     while :; do
-    
+
         read -rp "Have you written all this down? (y/n): " pass_check
 
         case "${pass_check,,}" in

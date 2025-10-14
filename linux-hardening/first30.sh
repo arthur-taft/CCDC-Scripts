@@ -15,12 +15,31 @@ source main/nuke_cron.sh
 source main/remove_package.sh
 source main/update_user_pass.sh 
 
+modify_iface=true
+
+while getopts ":i" opt; do
+    case "$opt" in
+        i) 
+            modify_iface=false
+            ;;
+        \?) 
+            echo "Unknown option: -$OPTARG" >&2
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+export modify_iface
+
 # Track how many backups are made for versioning
 acct_bak_count=0 
 etc_bak_count=0
 
 # Make array containing network interfaces
 mapfile -t interfaces < <(ip -o link show | awk -F': ' '{print $2}')
+export interfaces
 
 # Get os name and version
 get_os_name_ver
@@ -36,6 +55,8 @@ elif [[ "$OS" =~ "fedora" ]]; then
     # Shorten Fedora Linux to fedora
     OS="fedora"
 fi
+
+export OS VER
 
 package_manager=check_package_manager
 
@@ -65,5 +86,82 @@ function service_backup() {
     tar -cJf /root/b/binary_bak.tar.xz /usr/bin/python3
 }
 
+function check_tmux() {
+    tmux --help 
+    
+    tmux_status=$?
+
+    if [ "$tmux_status" -ne "0" ]; then
+        echo "tmux not detected, installing now..."
+        install_package "$package_manager" "tmux"
+    else
+        echo "tmux found, skipping install"
+    fi
+}
+
+function package_management() {
+    nano --help
+
+    nano_status=$?
+
+    vim --help
+
+    vim_status=$?
+
+    if [ "$nano_status" -eq "0" ]; then
+        remove_package "$package_manager" "nano"
+    fi
+
+    if [ "$vim_status" -ne "0" ]; then
+        install_package "$package_manager" "vim"
+    fi
+}
+
 # TODO: Figure out how to disable cockpit
+# TODO: Update sshd config
+
+# Backup acct things
+export -f backup_group_passwd_shadow
+export -f backup_etc
+export -f service_backup
+export -f create_backup_usr
+# Updates root and backup user password
+export -f second_pass_update
+export -f check_package_manager
+export -f install_package
+export -f interface_down
+export -f interface_up
+export -f nuke_cron
+export -f remove_package
+# Updates all user passwords to a random string
+export -f update_user_pass
+
+function setup_tmux() {
+    tmux new-session -d -s start \; \
+        tmux select-window -t start:0 \; \
+        select-pane -t 0\; \
+        attach-session -t start \
+        # Create 'user' tab
+        tmux rename-window -t start:0 user \; \
+            split-window -h \; \
+            select-pane -t 0 \; \
+                send-keys 'bash -c "update_user_pass"' C-m \; \
+            select-pane -t 1 \; \
+                send-keys 'bash -c "service_backup && interface_down interfaces modify_iface"' C-m \; \
+            select-pane -t 0 \; \
+                send-keys 'bash -c "create_backup_usr && second_pass_update"' C-m \; \
+            select-pane -t 1 \; \
+                send-keys 'bash -c "nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up interfaces modify_iface"' C-m \;
+        # Create banner tab
+        tmux new-window -t start:1 -n 'banner' \; \
+            split-window \; \
+            split-window \; \
+            select-pane -t 0 \; \
+                send-keys 'vim /etc/ssh/sshd_config' C-m \; \
+            select-pane -t 1 \; \
+                send-keys 'vim /etc/issue.net' C-m \; \
+            select-pane -t 2 \; \
+                send-keys 'Banner /etc/issue.net in config and write issue' \;
+}
+
 
