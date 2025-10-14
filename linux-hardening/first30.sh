@@ -162,33 +162,35 @@ function setup_tmux() {
 #                send-keys 'vim /etc/issue.net' C-m \; \
 #            select-pane -t 2 \; \
 #                send-keys 'Banner /etc/issue.net in config and write issue' \;
-      tmux select-window -t start:0
-      tmux kill-pane -a -t start:0 2>/dev/null
-      tmux split-window -h -t start:0
+    tmux new-session -d -s start -n user
 
-      tmux new-window -t start:1 -n banner
-      tmux kill-pane -a -t start:1 2>/dev/null
-      tmux split-window -t start:1
-      tmux split-window -t start:1
+    tmux select-window -t start:0
+    tmux kill-pane -a -t start:0 2>/dev/null
+    tmux split-window -h -t start:0
 
-      # Clear and set a hook to signal when a client attaches
-      tmux set-hook -t start -u client-attached
-      tmux set-hook -t start client-attached 'wait-for -S start_go'
+    tmux new-window -t start:1 -n banner
+    tmux kill-pane -a -t start:1 2>/dev/null
+    tmux split-window -t start:1
+    tmux split-window -t start:1
 
-      # Block THIS shell until you attach to the session
-      tmux display-message -t start "Waiting for attach to start tasks…"
-      tmux attach -t start &  # put attach in background so our function continues
-      tmux wait-for start_go  # resumes only once attached
+    # Clear and set a hook to signal when a client attaches
+    tmux set-hook -t start -u client-attached
+    tmux set-hook -t start client-attached 'wait-for -S start_go'
 
-      # Now that you’re attached, fire the commands
-      tmux send-keys -t start:0.0 'bash -c "update_user_pass"' C-m
-      tmux send-keys -t start:0.1 'bash -c "service_backup && interface_down interfaces modify_iface"' C-m
-      tmux send-keys -t start:0.0 'bash -c "create_backup_usr && second_pass_update"' C-m
-      tmux send-keys -t start:0.1 'bash -c "nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up interfaces modify_iface"' C-m
+    # Block THIS shell until you attach to the session
+    tmux display-message -t start "Waiting for attach to start tasks…"
+    tmux attach -t start &  # put attach in background so our function continues
+    tmux wait-for start_go  # resumes only once attached
 
-      tmux send-keys -t start:1.0 'vim /etc/ssh/sshd_config' C-m
-      tmux send-keys -t start:1.1 'vim /etc/issue.net' C-m
-      tmux send-keys -t start:1.2 'echo "Banner /etc/issue.net in config and write issue"' C-m
+    # Now that you’re attached, fire the commands
+    tmux send-keys -t start:0.0 'bash -c "update_user_pass"' C-m
+    tmux send-keys -t start:0.1 'bash -c "service_backup && interface_down interfaces modify_iface"' C-m
+    tmux send-keys -t start:0.0 'bash -c "create_backup_usr && second_pass_update"' C-m
+    tmux send-keys -t start:0.1 'bash -c "nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up interfaces modify_iface"' C-m
+
+    tmux send-keys -t start:1.0 'vim /etc/ssh/sshd_config' C-m
+    tmux send-keys -t start:1.1 'vim /etc/issue.net' C-m
+    tmux send-keys -t start:1.2 'echo "Banner /etc/issue.net in config and write issue"' C-m
 }
 
 check_tmux
