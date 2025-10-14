@@ -164,4 +164,8 @@ function setup_tmux() {
                 send-keys 'Banner /etc/issue.net in config and write issue' \;
 }
 
+backup_group_passwd_shadow
 
+backup_etc
+
+setup_tmux
