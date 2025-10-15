@@ -7,6 +7,7 @@ fi
 
 source main/bak_usr_and_pass_update.sh 
 source main/check_package_manager.sh
+source main/disable_cockpit.sh
 source main/get_os_name_ver.sh 
 source main/install_package.sh
 source main/interface_down.sh 
@@ -154,6 +155,8 @@ function package_management() {
     fi
 }
 
+# TODO: Add os checking for repo updates
+
 # TODO: Figure out how to disable cockpit
 # TODO: Update sshd config
 
@@ -172,6 +175,7 @@ export -f nuke_cron
 export -f remove_package
 # Updates all user passwords to a random string
 export -f update_user_pass
+export -f disable_cockpit
 
 function setup_tmux() {
     # 1) Create session if missing (detached)
@@ -204,7 +208,7 @@ function setup_tmux() {
             tmux send-keys -t start:0.1 "bash -c 'service_backup && interface_down $modify_iface ${interfaces[*]}'" C-m
             tmux send-keys -t start:0.0 'bash -c "update_user_pass && create_backup_usr && second_pass_update; tmux wait-for -S usr_ready"' C-m
             tmux wait-for usr_ready
-            tmux send-keys -t start:0.1 "bash -c 'nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up $modify_iface ${interfaces[*]}'" C-m
+            tmux send-keys -t start:0.1 "bash -c 'nuke_cron && disable_cockpit && backup_group_passwd_shadow && backup_etc && interface_up $modify_iface ${interfaces[*]}'" C-m
             tmux send-keys -t start:1.0 'vim /etc/ssh/sshd_config' C-m
             tmux send-keys -t start:1.1 'vim /etc/issue.net' C-m
             tmux send-keys -t start:1.2 'echo "Banner /etc/issue.net in config and write issue"' C-m
