@@ -161,9 +161,23 @@ function package_management() {
 }
 
 # TODO: Add os checking for repo updates
-
-# TODO: Figure out how to disable cockpit
-# TODO: Update sshd config
+function fix_package_manager() {
+    case "$OS" in
+        ubuntu)
+            ;;
+        debian)
+            if (( VER <= 9 )); then
+                sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list
+                sed -i 's/security.debian.org/archive.debian.org/g' /etc/apt/sources.list
+                sed -i '/stretch-updates/d' /etc/apt/sources.list
+            fi
+            ;;
+        fedora)
+            ;;
+        centos)
+            ;;
+    esac
+}
 
 # Backup acct things
 export -f backup_group_passwd_shadow
