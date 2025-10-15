@@ -7,8 +7,6 @@ function update_user_pass() {
     else 
         mapfile -t users < <(awk -F':' '{print $1}' /etc/passwd)
 
-        printf "Username\tPassword"
-
         for user in "${users[@]}"; do
             if [ "$user" = "root" ]; then
                 echo "Don't nuke the root user :)"
