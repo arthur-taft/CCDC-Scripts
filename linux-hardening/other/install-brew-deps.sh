@@ -52,7 +52,9 @@ brew_check() {
 function install_brew_deps_ubuntu() {
     echo Installing dependencies
 
-    install_package "$package_manager" "${ubuntu_dependencies[*]}"
+    for package in "${ubuntu_dependencies[@]}"; do
+        install_package "$package_manager" "$package"
+    done
 
     install_status=$?
 
