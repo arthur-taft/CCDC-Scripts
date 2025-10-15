@@ -89,24 +89,67 @@ function service_backup() {
 }
 
 function check_tmux() {
-    which tmux 
+    which tmux > /dev/null 2>&1
     
     tmux_status=$?
 
     if [ "$tmux_status" -ne "0" ]; then
         echo "tmux not detected, installing now..."
         install_package "$package_manager" "tmux"
+
+        install_status=$?
+
+        if [ "$install_status" -ne "0" ]; then
+            echo "Default install did not work, attempting with pre-supplied archive..."
+            
+            case "$OS" in
+                ubuntu|debian)
+                    install_package "$package_manager" "binaries/tmux_ubuntu_22.04.deb"
+                    ;;
+                centos|rocky|almalinux|fedora)
+                    install_package"$package_manager" "binaries/tmux_fedora_42.rpm"
+                    ;;
+            esac
+        fi 
+
+        install_status=$?
+
+        if [ "$install_status" -ne "0" ]; then
+            echo "Pre-supplied archive install did not work, attempting to manually add binary to path..."
+            case "$OS" in
+                ubuntu|debian)
+                    mkdir binaries/tmux
+
+                    cp binaries/tmux_ubuntu_22.04.deb binaries/tmux
+
+                    ar x binaries/tmux/tmux_ubuntu_22.04.deb
+
+                    tar xf binaries/tmux/data.tar.zst
+
+                    ln -sf binaries/tmux/usr/bin/tmux /usr/bin/tmux
+                    ;;
+                centos|rocky|almalinux|fedora)
+                    mkdir binaries/tmux 
+
+                    cp binaries/tmux_fedora_42.rpm binaries/tmux 
+
+                    rpm2cpio tmux_fedora_42.rpm | cpio -idmv
+
+                    ln -sf binaries/tmux/usr/bin/tmux /usr/bin/tmux
+                    ;;
+            esac
+        fi
     else
         echo "tmux found, skipping install"
     fi
 }
 
 function package_management() {
-    which nano
+    which nano > /dev/null 2>&1
 
     nano_status=$?
 
-    which vim
+    which vim > /dev/null 2>&1
 
     vim_status=$?
 
