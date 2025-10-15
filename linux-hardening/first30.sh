@@ -219,7 +219,7 @@ function setup_tmux() {
     # Already inside a tmux client: switch now, then fire immediately.
     tmux switch-client -t start
     tmux send-keys -t start:0.0 'bash -c "update_user_pass"' C-m
-    tmux send-keys -t start:0.1 'bash -c "service_backup && interface_down interfaces modify_iface"' C-m
+    tmux send-keys -t start:0.1 "bash -c 'service_backup && interface_down $interfaces $modify_iface'" C-m
     tmux send-keys -t start:0.0 'bash -c "create_backup_usr && second_pass_update"' C-m
     tmux send-keys -t start:0.1 'bash -c "nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up interfaces modify_iface"' C-m
     tmux send-keys -t start:1.0 'vim /etc/ssh/sshd_config' C-m
@@ -230,7 +230,7 @@ function setup_tmux() {
     (
       sleep 0.3
       tmux send-keys -t start:0.0 'bash -c "update_user_pass"' C-m
-      tmux send-keys -t start:0.1 'bash -c "service_backup && interface_down interfaces modify_iface"' C-m
+      tmux send-keys -t start:0.1 "bash -c 'service_backup && interface_down $interfaces $modify_iface'" C-m
       tmux send-keys -t start:0.0 'bash -c "create_backup_usr && second_pass_update"' C-m
       tmux send-keys -t start:0.1 'bash -c "nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up interfaces modify_iface"' C-m
       tmux send-keys -t start:1.0 'vim /etc/ssh/sshd_config' C-m
