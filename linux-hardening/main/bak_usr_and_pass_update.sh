@@ -9,7 +9,7 @@ function create_backup_usr() {
         case "${usr_confirm,,}" in
             y)
                 echo "Creating user now"
-                useradd -m -G video,audio,wheel -s /bin/bash "$backup_usr"
+                useradd -m -G video,audio,wheel,sudo -s /bin/bash "$backup_usr"
                 break
                 ;;
             n)
@@ -35,8 +35,8 @@ function second_pass_update() {
         
         while :; do
             # -rs preserves backslashes and reads as a secure string
-            read -rs "Enter the new password for $user: " new_pass
-            read -rs "Enter password again: " new_pass_again
+            read -rsp "Enter the new password for $user: " new_pass
+            read -rsp "Enter password again: " new_pass_again
 
             if [ "$new_pass" != "$new_pass_again" ]; then
                 echo "Passwords do not match!"
