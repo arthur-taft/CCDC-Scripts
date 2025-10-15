@@ -34,6 +34,9 @@ declare -a fedora_dependencies
 ubuntu_dependencies=( "build-essential" "procps" "curl" "file" "git" )
 fedora_dependencies=( "diffstat" "doxygen" "gettext" "git" "patch" "patchutils" "subversion" "systemtap" "file" )
 
+ubuntu_file_path="../binaries/brew/deb/"
+fedora_file_path="../binaries/brew/rpm/"
+
 brew_check() {
     which brew 
 
@@ -58,6 +61,7 @@ function install_brew_ubuntu() {
         
         for archive in "${ubuntu_dependencies[@]}"; do
             archive+="_ubuntu_22.04.deb"
+            ubuntu_file_path+="$archive"
             install_package "$package_manager" "$archive"
         done
     fi
@@ -79,7 +83,9 @@ function install_brew_ubuntu() {
 function install_brew_fedora() {
     echo Installing dependencies
 
-    install_package "$package_manager" "diffstat doxygen gettext git patch patchutils subversion systemtap file"
+    dnf group install development-tools
+
+    dnf install procps-ng curl file
 
     install_status=$?
 
@@ -88,6 +94,7 @@ function install_brew_fedora() {
         
         for archive in "${fedora_dependencies[@]}"; do
             archive+="_fedora_42.rpm"
+            fedora_file_path+="$archive"
             install_package "$package_manager" "$archive"
         done
     fi
