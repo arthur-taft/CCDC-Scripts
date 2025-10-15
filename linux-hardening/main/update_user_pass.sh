@@ -3,6 +3,7 @@
 function update_user_pass() {
     if [ -f /root/passupdate ]; then
         echo "Passwords have been updated. Skipping..."
+        return 0
     else 
         mapfile -t users < <(awk -F':' '{print $1}' /etc/passwd)
 
