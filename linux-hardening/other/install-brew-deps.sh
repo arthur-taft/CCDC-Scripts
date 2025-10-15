@@ -52,7 +52,7 @@ brew_check() {
 function install_brew_deps_ubuntu() {
     echo Installing dependencies
 
-    install_package "$package_manager" "build-essiential procps curl file git"
+    install_package "$package_manager" "${ubuntu_dependencies[*]}"
 
     install_status=$?
 
@@ -77,9 +77,7 @@ function install_brew_deps_ubuntu() {
 function install_brew_deps_fedora() {
     echo Installing dependencies
 
-    dnf group install development-tools
-
-    dnf install procps-ng curl file
+    install_package "$package_manager" "${fedora_dependencies[*]}"
 
     install_status=$?
 
