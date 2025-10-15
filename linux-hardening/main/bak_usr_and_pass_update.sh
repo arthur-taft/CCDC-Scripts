@@ -35,8 +35,8 @@ function second_pass_update() {
         
         while :; do
             # -rs preserves backslashes and reads as a secure string
-            read -rsp "Enter the new password for $user: " new_pass
-            read -rsp "Enter password again: " new_pass_again
+            read -rsp "Enter the new password for $user: " new_pass; echo # Add echo so we aren't stuck on the same line
+            read -rsp "Enter password again: " new_pass_again; echo
 
             if [ "$new_pass" != "$new_pass_again" ]; then
                 echo "Passwords do not match!"
