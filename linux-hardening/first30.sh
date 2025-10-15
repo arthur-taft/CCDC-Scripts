@@ -215,17 +215,7 @@ function setup_tmux() {
   tmux select-pane   -t start:0.0
 
   # 4) Start tasks automatically *after* attach
-  if [ -n "$TMUX" ]; then
-    # Already inside a tmux client: switch now, then fire immediately.
-    tmux switch-client -t start
-    tmux send-keys -t start:0.0 'bash -c "update_user_pass"' C-m
-    tmux send-keys -t start:0.1 "bash -c 'service_backup && interface_down $interfaces $modify_iface'" C-m
-    tmux send-keys -t start:0.0 'bash -c "create_backup_usr && second_pass_update"' C-m
-    tmux send-keys -t start:0.1 'bash -c "nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up interfaces modify_iface"' C-m
-    tmux send-keys -t start:1.0 'vim /etc/ssh/sshd_config' C-m
-    tmux send-keys -t start:1.1 'vim /etc/issue.net' C-m
-    tmux send-keys -t start:1.2 'echo "Banner /etc/issue.net in config and write issue"' C-m
-  elif [ -t 0 ] && [ -t 1 ]; then
+  if [ -t 0 ] && [ -t 1 ]; then
     # Real TTY: queue the commands to run shortly after attach.
     (
       sleep 0.3
