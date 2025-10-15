@@ -49,7 +49,7 @@ brew_check() {
     fi
 }
 
-function install_brew_ubuntu() {
+function install_brew_deps_ubuntu() {
     echo Installing dependencies
 
     install_package "$package_manager" "build-essiential procps curl file git"
@@ -72,15 +72,9 @@ function install_brew_ubuntu() {
         echo "Your dependencies are cooked pal, good luck"
         exit 1
     fi
-
-    echo Installing brew 
-
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    exit 0
 }
 
-function install_brew_fedora() {
+function install_brew_deps_fedora() {
     echo Installing dependencies
 
     dnf group install development-tools
@@ -105,12 +99,6 @@ function install_brew_fedora() {
         echo "Your dependencies are cooked pal, good luck"
         exit 1
     fi
-
-    echo Installing brew 
-
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    exit 0
 }
 
 case "$OS" in
