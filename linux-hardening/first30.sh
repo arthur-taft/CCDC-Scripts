@@ -118,10 +118,6 @@ function check_tmux() {
             echo "Pre-supplied archive install did not work, attempting to manually add binary to path..."
             case "$OS" in
                 ubuntu|debian)
-                    mkdir binaries/tmux
-
-                    cp binaries/tmux_ubuntu_22.04.deb binaries/tmux
-
                     ar x binaries/tmux/tmux_ubuntu_22.04.deb
 
                     tar xf binaries/tmux/data.tar.zst
@@ -129,10 +125,6 @@ function check_tmux() {
                     ln -sf binaries/tmux/usr/bin/tmux /usr/bin/tmux
                     ;;
                 centos|rocky|almalinux|fedora)
-                    mkdir binaries/tmux 
-
-                    cp binaries/tmux_fedora_42.rpm binaries/tmux 
-
                     rpm2cpio tmux_fedora_42.rpm | cpio -idmv
 
                     ln -sf binaries/tmux/usr/bin/tmux /usr/bin/tmux
