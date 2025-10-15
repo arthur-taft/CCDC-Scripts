@@ -16,6 +16,7 @@ source main/nuke_cron.sh
 source main/remove_package.sh
 source main/update_user_pass.sh 
 source main/configure_sshd.sh
+source other/fix_package_manager.sh
 
 modify_iface=true
 config_sshd=false
@@ -160,25 +161,6 @@ function package_management() {
     fi
 }
 
-# TODO: Add os checking for repo updates
-function fix_package_manager() {
-    case "$OS" in
-        ubuntu)
-            ;;
-        debian)
-            if (( VER <= 9 )); then
-                sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list
-                sed -i 's/security.debian.org/archive.debian.org/g' /etc/apt/sources.list
-                sed -i '/stretch-updates/d' /etc/apt/sources.list
-            fi
-            ;;
-        fedora)
-            ;;
-        centos)
-            ;;
-    esac
-}
-
 # Backup acct things
 export -f backup_group_passwd_shadow
 export -f backup_etc
@@ -244,6 +226,8 @@ function setup_tmux() {
         fi
 
 }
+
+fix_package_manager
 
 check_tmux
 
