@@ -109,3 +109,5 @@ case "$OS" in
         install_brew_deps_fedora
         ;;
 esac
+
+echo 'export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"' > /etc/profile.d/brew-path.sh

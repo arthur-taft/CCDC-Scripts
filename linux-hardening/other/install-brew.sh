@@ -6,3 +6,5 @@ if (( EUID = 0 )); then
 fi
 
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+souce /etc/profile
