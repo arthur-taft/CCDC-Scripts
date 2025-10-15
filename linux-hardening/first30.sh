@@ -37,6 +37,8 @@ export modify_iface
 acct_bak_count=0 
 etc_bak_count=0
 
+export acct_bak_count etc_bak_count
+
 # Make array containing network interfaces
 mapfile -t interfaces < <(ip -o link show | awk -F': ' '{print $2}')
 export interfaces
