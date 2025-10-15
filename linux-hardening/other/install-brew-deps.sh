@@ -103,9 +103,9 @@ function install_brew_deps_fedora() {
 
 case "$OS" in
     ubuntu|debian)
-        install_brew_ubuntu
+        install_brew_deps_ubuntu
         ;;
     centos|rocky|almalinux|fedora)
-        install_brew_fedora
+        install_brew_deps_fedora
         ;;
 esac
