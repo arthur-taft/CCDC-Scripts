@@ -192,68 +192,60 @@ function setup_tmux() {
 #    tmux send-keys -t start:1.1 'vim /etc/issue.net' C-m
 #    tmux send-keys -t start:1.2 'echo "Banner /etc/issue.net in config and write issue"' C-m
 
-      # 1) Ensure the session exists (detached)
-      if ! tmux has-session -t start 2>/dev/null; then
-        tmux new-session -d -s start -n user
-      fi
+  # 1) Create session if missing (detached)
+  if ! tmux has-session -t start 2>/dev/null; then
+    tmux new-session -d -s start -n user
+  fi
 
-      # 2) Build layout (idempotent)
-      tmux select-window -t start:0
-      tmux kill-pane    -a -t start:0 2>/dev/null
-      tmux split-window -h -t start:0
+  # 2) Build layout (idempotent)
+  tmux select-window -t start:0
+  tmux kill-pane    -a -t start:0 2>/dev/null
+  tmux split-window -h -t start:0
 
-      tmux new-window   -t start:1 -n banner 2>/dev/null || true
-      tmux kill-pane    -a -t start:1 2>/dev/null
-      tmux split-window    -t start:1
-      tmux split-window    -t start:1
+  tmux new-window   -t start:1 -n banner 2>/dev/null || true
+  tmux kill-pane    -a -t start:1 2>/dev/null
+  tmux split-window    -t start:1
+  tmux split-window    -t start:1
 
-      tmux setw -t start:0 remain-on-exit on
-      tmux setw -t start:1 remain-on-exit on
+  tmux setw -t start:0 remain-on-exit on
+  tmux setw -t start:1 remain-on-exit on
 
-      # 3) Define the "start once" task runner
-      # Uses a session variable @started so we don't double-run.
-      tmux set-environment -t start -g @started 0 2>/dev/null || true
-      tmux set-hook -t start -u client-attached 2>/dev/null || true
-      tmux set-hook -t start client-attached "if -F '#{==:#{session_attached},1}' 'run-shell -b \"\
-        if [ \\\"\\\$(tmux show-environment -t start -g @started 2>/dev/null | cut -d= -f2)\\\" != 1 ]; then \
-          tmux set-environment -t start -g @started 1; \
-          tmux send-keys -t start:0.0 'bash -c \\\"update_user_pass\\\"' C-m; \
-          tmux send-keys -t start:0.1 'bash -c \\\"service_backup && interface_down interfaces modify_iface\\\"' C-m; \
-          tmux send-keys -t start:0.0 'bash -c \\\"create_backup_usr && second_pass_update\\\"' C-m; \
-          tmux send-keys -t start:0.1 'bash -c \\\"nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up interfaces modify_iface\\\"' C-m; \
-          tmux send-keys -t start:1.0 'vim /etc/ssh/sshd_config' C-m; \
-          tmux send-keys -t start:1.1 'vim /etc/issue.net' C-m; \
-          tmux send-keys -t start:1.2 'echo \\\"Banner /etc/issue.net in config and write issue\\\"' C-m; \
-        fi\"'"
+  # 3) Land on main pane
+  tmux select-window -t start:0
+  tmux select-pane   -t start:0.0
 
-      # 4) Land on main pane
-      tmux select-window -t start:0
-      tmux select-pane   -t start:0.0
+  # 4) Start tasks automatically *after* attach
+  if [ -n "$TMUX" ]; then
+    # Already inside a tmux client: switch now, then fire immediately.
+    tmux switch-client -t start
+    tmux send-keys -t start:0.0 'bash -c "update_user_pass"' C-m
+    tmux send-keys -t start:0.1 'bash -c "service_backup && interface_down interfaces modify_iface"' C-m
+    tmux send-keys -t start:0.0 'bash -c "create_backup_usr && second_pass_update"' C-m
+    tmux send-keys -t start:0.1 'bash -c "nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up interfaces modify_iface"' C-m
+    tmux send-keys -t start:1.0 'vim /etc/ssh/sshd_config' C-m
+    tmux send-keys -t start:1.1 'vim /etc/issue.net' C-m
+    tmux send-keys -t start:1.2 'echo "Banner /etc/issue.net in config and write issue"' C-m
+  elif [ -t 0 ] && [ -t 1 ]; then
+    # Real TTY: queue the commands to run shortly after attach.
+    (
+      sleep 0.3
+      tmux send-keys -t start:0.0 'bash -c "update_user_pass"' C-m
+      tmux send-keys -t start:0.1 'bash -c "service_backup && interface_down interfaces modify_iface"' C-m
+      tmux send-keys -t start:0.0 'bash -c "create_backup_usr && second_pass_update"' C-m
+      tmux send-keys -t start:0.1 'bash -c "nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up interfaces modify_iface"' C-m
+      tmux send-keys -t start:1.0 'vim /etc/ssh/sshd_config' C-m
+      tmux send-keys -t start:1.1 'vim /etc/issue.net' C-m
+      tmux send-keys -t start:1.2 'echo "Banner /etc/issue.net in config and write issue"' C-m
+    ) &
 
-      # 5) Attach *only* when an interactive TTY exists; otherwise, leave session running
-      if [ -n "$TMUX" ]; then
-        # Already inside a tmux client → switch this client, then start immediately (hook won't fire)
-        tmux switch-client -t start
-        # Manually start once if not started yet
-        if [ "$(tmux show-environment -t start -g @started 2>/dev/null | cut -d= -f2)" != 1 ]; then
-          tmux set-environment -t start -g @started 1
-          tmux send-keys -t start:0.0 'bash -c "update_user_pass"' C-m
-          tmux send-keys -t start:0.1 'bash -c "service_backup && interface_down interfaces modify_iface"' C-m
-          tmux send-keys -t start:0.0 'bash -c "create_backup_usr && second_pass_update"' C-m
-          tmux send-keys -t start:0.1 'bash -c "nuke_cron && backup_group_passwd_shadow && backup_etc && interface_up interfaces modify_iface"' C-m
-          tmux send-keys -t start:1.0 'vim /etc/ssh/sshd_config' C-m
-          tmux send-keys -t start:1.1 'vim /etc/issue.net' C-m
-          tmux send-keys -t start:1.2 'echo "Banner /etc/issue.net in config and write issue"' C-m
-        fi
-      elif [ -t 0 ] && [ -t 1 ]; then
-        # Real terminal → attach; the hook will auto-start tasks
-        : "${TERM:=xterm-256color}"
-        exec tmux attach -t start
-      else
-        # No TTY (cron/systemd/non-interactive sudo) → don't attach, don't start
-        echo "Created tmux session 'start' but no interactive TTY detected."
-        echo "Attach later from a terminal: tmux attach -t start"
-      fi
+    # Attach in the foreground; no hooks, no background attach → no TTY errors.
+    : "${TERM:=xterm-256color}"
+    exec tmux attach -t start
+  else
+    # No interactive TTY (cron/systemd). Don’t attach; also don’t start tasks.
+    echo "Created tmux session 'start' but no interactive TTY detected."
+    echo "Attach from a terminal: tmux attach -t start"
+  fi      
     
 }
 
