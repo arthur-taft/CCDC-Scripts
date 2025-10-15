@@ -15,7 +15,7 @@ function update_user_pass() {
                 pass=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13)
                 echo "$user:$pass" | chpasswd &>/dev/null
 
-                printf "%s\t%s" "$user" "$pass"
+                printf "\n%s\t%s" "$user" "$pass"
             fi
         done
         touch /root/passupdate
