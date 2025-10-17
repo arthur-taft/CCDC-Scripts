@@ -90,4 +90,31 @@ Windows version: $((Get-WmiObject win32_operatingsystem).version)
     Register-ScheduledTask 'Run-Checks' -Action $taskAction -Trigger $taskTrigger
     Start-ScheduledTask 'Run-Checks'
 
+    echo "`n******************** ENABLE SYSMON ********************`n"
+
+    echo "Fetching Sysmon...`n"
+
+    Invoke-WebRequest https://download.sysinternals.com/files/Sysmon.zip -OutFile "$ROOT\sysmon.zip"
+    Expand-Archive -Path "$ROOT\sysmon.zip" -DestinationPath "$ROOT\sysmon"
+
+    echo "`nInstalling Sysmon...`n"
+
+    $config_file = "n"
+    $config_file = Read-Host "Do you have a configuration file to pass? [Y]es [N]o (Defalt is No)"
+
+    if ($config_file -eq "y")
+    {
+        echo "`nContinuing with custom installation...`n"
+        $config_location = Read-Host "Please provide the absolute path to the configuration file here"
+        Start-Process -FilePath "$ROOT\sysmon\Sysmon.exe" -ArgumentList "-accepteula -i $config_location"
+        
+    } 
+    elseif ($config_file -eq "n") 
+    {
+        echo "`nContinuing with default installation`n"
+        Start-Process -FilePath "$ROOT\sysmon\Sysmon.exe" -ArgumentList "-accepteula -i"
+    }
+
+    echo "`nSysmon is now installed and running`n"
+
 } | Tee-Object $LOGS\PS-MAINS-OUT.txt

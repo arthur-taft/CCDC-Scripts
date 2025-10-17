@@ -124,7 +124,7 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
 #
 #    Register-ScheduledTask 'Run-Checks' -Action $taskAction -Trigger $taskTrigger
 #    Start-ScheduledTask 'Run-Checks'
-
+    
     echo "`n******************** ENABLE SYSMON ********************`n"
 
     echo "Fetching Sysmon...`n"
@@ -151,6 +151,7 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
     }
 
     echo "`nSysmon is now installed and running`n"
+
 
 } | Out-Default
 
