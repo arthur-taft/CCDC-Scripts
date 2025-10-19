@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# SUU Cybersecurity Club Linux Hardening Script
+# Ethan Hunt
+# Arthur Taft
+
 if (( EUID != 0 )); then
     echo "Script must be ran as root!"
     exit 1
