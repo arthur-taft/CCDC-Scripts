@@ -17,7 +17,7 @@ Start-Transcript -Path $LOGS\PS-MAINS-OUT.txt
     echo "`nCreating new local user 'Printer'..."
     $Password = Read-Host "Enter the new password for Printer" -AsSecureString
     New-LocalUser -Name Printer -Password $Password
-    Add-LocalGroupMember -Group "Administrators" -Member "Printer" | Out-Null
+    Add-LocalGroupMember -Group "Administrators" -Member "Printer" -ErrorAction SilentlyContinue
 
 	if($?)
 	{

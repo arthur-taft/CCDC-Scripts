@@ -26,11 +26,11 @@ Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
     $IP = Read-Host "Enter the wazuh manager IP"
     & $ROOT\wazuh-agent.msi /q WAZUH_MANAGER=$IP
 
-	$service = (Get-Service Wazuh)
+	$service = (Get-Service Wazuh -ErrorAction SilentlyContinue)
 	while ($service -eq $null) {
 		Start-Sleep -Seconds 1
 		echo "Waiting for Wazuh to install..."
-		$service = (Get-Service Wazuh) | Out-Null
+		$service = (Get-Service Wazuh -ErrorAction SilentlyContinue)
 	}
     NET START Wazuh
 

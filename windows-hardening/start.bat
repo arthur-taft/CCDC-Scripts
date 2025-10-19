@@ -27,12 +27,12 @@ ping amazon.com
 
 echo.
 echo Download software?
-SET install=N
+SET install=n
 echo.
 SET /p install="Yes[Y] No[N] (default is No): "
 echo.
 
-IF %install%==Y (
+IF %install%==y (
 	powershell ps\2016-Software.ps1
 )
 ::	IF %version% LEQ 5.1 (
@@ -49,15 +49,15 @@ powershell Set-ExecutionPolicy -ExecutionPolicy Restricted
 
 echo.
 echo Rebooting is required for changes to happen. Restart Now?
-SET restart=N
+SET restart=n
 echo.
 SET /p restart="Yes[Y] No[N] (default is No): "
 
-IF %restart%==Y (
+IF %restart%==y (
 	shutdown -r -t 0
 )
 
-IF %restart%==Yes (
+IF %restart%==yes (
 	shutdown -r -t 0
 )
 
