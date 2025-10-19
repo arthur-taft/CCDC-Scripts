@@ -18,19 +18,21 @@ powershell Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 ::)
 
 echo.
-echo Pinging 8.8.8.8...
-ping 8.8.8.8
+echo ******************** PINGING 8.8.8.8 ********************
 echo.
+ping 8.8.8.8
 
-echo Pinging amazon.com...
+echo.
+echo ******************** PINGING amazon.com ********************
+echo.
 ping amazon.com
 
 echo.
-echo Download software?
+echo ******************** PROMPT FOR SOFTWARE INSTALL ********************
+echo.
+echo Install Software?
 SET install=n
-echo.
 SET /p install="Yes[Y] No[N] (default is No): "
-echo.
 
 IF %install%==y (
 	powershell ps\2016-Software.ps1
@@ -44,13 +46,17 @@ IF %install%==y (
 ::	)
 ::)
 
+echo.
+echo ******************** UPDATE EXECUTION POLICY ********************
+echo.
 echo Setting execution policy to Restricted...
 powershell Set-ExecutionPolicy -ExecutionPolicy Restricted
 
 echo.
+echo ******************** PROMPT FOR REBOOT ********************
+echo.
 echo Rebooting is required for changes to happen. Restart Now?
 SET restart=n
-echo.
 SET /p restart="Yes[Y] No[N] (default is No): "
 
 IF %restart%==y (
