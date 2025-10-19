@@ -49,6 +49,17 @@ IF %install%==y (
 ::)
 
 echo.
+echo ******************** PROMPT FOR PACKAGE MANAGER INSTALL ********************
+echo.
+echo Install Package Manager^(s^)?
+SET pacman_install=n
+SET /p pacman_install="Yes[Y] No[N] (default is No): "
+
+IF %pacman_install%==y (
+    powershell ps\2019-Package-Man.ps1
+)
+
+echo.
 echo ******************** UPDATE EXECUTION POLICY ********************
 echo.
 echo Setting execution policy to Restricted...
