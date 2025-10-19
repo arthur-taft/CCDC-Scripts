@@ -1,5 +1,7 @@
 @ECHO OFF 
 echo.
+echo ******************** UPDATE EXECUTION POLICY ********************
+echo.
 echo Setting execution policy to RemoteSigned...
 powershell Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 
@@ -18,12 +20,12 @@ powershell Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 ::)
 
 echo.
-echo ******************** PINGING 8.8.8.8 ********************
+echo ******************** PING 8.8.8.8 ********************
 echo.
 ping 8.8.8.8
 
 echo.
-echo ******************** PINGING amazon.com ********************
+echo ******************** PING amazon.com ********************
 echo.
 ping amazon.com
 
@@ -66,5 +68,7 @@ IF %restart%==y (
 IF %restart%==yes (
 	shutdown -r -t 0
 )
+
+echo.
 
 pause
