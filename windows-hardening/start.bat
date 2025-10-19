@@ -16,9 +16,12 @@ powershell Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 ping 8.8.8.8
 ping amazon.com
 
-echo Download software?
-SET install= N
-SET /p install="Yes[Y] No[N] (default is No)"
+@echo.
+@echo Download software?
+@SET install=N
+@echo.
+@SET /p install="Yes[Y] No[N] (default is No)"
+@echo.
 
 IF %install%==Y (
 	powershell ps\2016-Software.ps1
@@ -35,7 +38,7 @@ IF %install%==Y (
 powershell Set-ExecutionPolicy -ExecutionPolicy Restricted
 
 echo Rebooting is required for changes to happen. Restart Now?
-SET restart= N
+SET restart=N
 SET /p restart="Yes[Y] No[N] (default is No)"
 
 IF %restart%==Y (

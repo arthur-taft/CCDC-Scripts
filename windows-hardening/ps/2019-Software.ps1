@@ -30,7 +30,7 @@ Start-Transcript -Path "$LOGS\PS-SOFTWARE-OUT.txt"
 	while ($service -eq $null) {
 		Start-Sleep -Seconds 1
 		echo "Waiting for Wazuh to install..."
-		$service = (Get-Service Wazuh)
+		$service = (Get-Service Wazuh) | Out-Null
 	}
     NET START Wazuh
 
