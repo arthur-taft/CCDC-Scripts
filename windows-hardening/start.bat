@@ -1,4 +1,8 @@
+@ECHO OFF 
+echo.
+echo Setting execution policy to RemoteSigned...
 powershell Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+
 
 ::FOR /F "tokens=2" %%g IN ('powershell $PSVersionTable ^| findstr /C:"PSVersion"') do (SET version=%%g)
 ::
@@ -13,15 +17,20 @@ powershell Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 	powershell ps\2016-Main.ps1
 ::)
 
+echo.
+echo Pinging 8.8.8.8...
 ping 8.8.8.8
+echo.
+
+echo Pinging amazon.com...
 ping amazon.com
 
-@echo.
-@echo Download software?
-@SET install=N
-@echo.
-@SET /p install="Yes[Y] No[N] (default is No)"
-@echo.
+echo.
+echo Download software?
+SET install=N
+echo.
+SET /p install="Yes[Y] No[N] (default is No): "
+echo.
 
 IF %install%==Y (
 	powershell ps\2016-Software.ps1
@@ -35,11 +44,14 @@ IF %install%==Y (
 ::	)
 ::)
 
+echo Setting execution policy to Restricted...
 powershell Set-ExecutionPolicy -ExecutionPolicy Restricted
 
+echo.
 echo Rebooting is required for changes to happen. Restart Now?
 SET restart=N
-SET /p restart="Yes[Y] No[N] (default is No)"
+echo.
+SET /p restart="Yes[Y] No[N] (default is No): "
 
 IF %restart%==Y (
 	shutdown -r -t 0
