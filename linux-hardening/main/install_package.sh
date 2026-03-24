@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
 
+source ./colors.sh
+
 function install_package() {
     local package_manager="$1"
     if [[ -z "$package_manager" ]]; then
-        echo "Error: No package manager provided to install package :("
+        printf "${RED}[ERROR]${NC} No package manager provided to install package :(\n"
         exit 1
     fi
 
     local package_name="$2"
     if [[ -z "$package_name" ]]; then
-        echo "Error: No package name provided to install package :("
+        printf "${RED}ERROR${NC} No package name provided to install package :(\n"
         exit 1
     fi
 
     if [[ "$package_manager" == "unsupported" ]]; then
-        echo "Error: Unsupported operating system :("
+        printf "${RED}ERROR${NC} Unsupported operating system :(\n"
         exit 1
     fi
 

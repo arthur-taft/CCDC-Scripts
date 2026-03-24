@@ -34,7 +34,7 @@ function update_user_pass() {
                 break
                 ;;
             *)
-                echo "Response must be 'y' or 'n'"
+                printf "${RED}[ERROR]${NC} Response must be 'y' or 'n'\n"
                 ;;
         esac
     done

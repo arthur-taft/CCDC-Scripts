@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
+source ./colors.sh
+
 function interface_down() {
     local flag="$1"
     shift
 
     if [ "$flag" = "false" ]; then
-        echo "Network interface modification is disabled"
+        printf "${YELLOW}[WARN]${NC} Network interface modification is disabled\n"
         return 0
     fi
 

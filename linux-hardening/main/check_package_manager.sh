@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
+source ./colors.sh
+
 function check_package_manager() {
     if [[ -z "$OS" ]]; then
-        echo "Error: No OS name provided to remove_package."
+        printf "${RED}[ERROR]${NC} No OS name provided to remove_package.\n"
         exit 1
     fi
 

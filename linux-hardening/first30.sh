@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
+source main/colors.sh
+
 if (( EUID != 0 )); then
-    echo "Script must be ran as root!"
+    printf "${RED}[ERROR]${NC} Script must be ran as root!\n"
     exit 1
 fi
+
+export RED GREEN YELLOW NC
 
 source main/bak_usr_and_pass_update.sh 
 source main/check_package_manager.sh
@@ -23,14 +27,10 @@ config_sshd=false
 
 while getopts ":i:s" opt; do
     case "$opt" in
-        i) 
-            modify_iface=false
-            ;;
-        s)
-            config_sshd=true
-            ;;
+        i) modify_iface=false ;;
+        s) config_sshd=true ;;
         \?) 
-            echo "Unknown option: -$OPTARG" >&2
+            printf "${RED}[ERROR]${NC}\t Unknown option: -%s\n" "$OPTARG" >&2
             exit 1
             ;;
     esac
@@ -56,7 +56,6 @@ echo "OS=$OS VER=$VER" > /dev/null 2>&1
 
 # Clean things up
 OS="${OS,,}"
-
 if [ "$OS" = "ubuntu" ]; then
     # Fix version to work with integer comparison
     VER="${VER::-3}"
@@ -88,7 +87,7 @@ function service_backup() {
 
     tar -cJf /root/b/web_bak.tar.xz /var/www/html
 
-    if [ $(ss -autpn | grep splunk) ]; then
+    if [ "$(ss -autpn | grep -q splunk)" ]; then
         tar -cJf /root/b/splunk_bak.tar.xz /opt
     fi
 
@@ -101,13 +100,13 @@ function check_tmux() {
     tmux_status=$?
 
     if [ "$tmux_status" -ne "0" ]; then
-        echo "tmux not detected, installing now..."
+        printf "${YELLOW}[WARN]${NC} tmux not detected, installing now...\n"
         install_package "$package_manager" "tmux"
 
         install_status=$?
 
         if [ "$install_status" -ne "0" ]; then
-            echo "Default install did not work, attempting with pre-supplied archive..."
+            printf "${YELLOW}[WARN]${NC} Default install did not work, attempting with pre-supplied archive...\n"
             
             case "$OS" in
                 ubuntu|debian)
@@ -122,7 +121,7 @@ function check_tmux() {
         install_status=$?
 
         if [ "$install_status" -ne "0" ]; then
-            echo "Pre-supplied archive install did not work, attempting to manually add binary to path..."
+            printf "${YELLOW}[WARN]${NC} Pre-supplied archive install did not work, attempting to manually add binary to path...\n"
             case "$OS" in
                 ubuntu|debian)
                     ar x binaries/tmux/tmux_ubuntu_22.04.deb
@@ -139,7 +138,7 @@ function check_tmux() {
             esac
         fi
     else
-        echo "tmux found, skipping install"
+        printf "${GREEN}[SUCCESS]${NC} tmux found, skipping install\n"
     fi
 }
 
@@ -221,8 +220,8 @@ function setup_tmux() {
             exec tmux attach -t start
         else
             # No interactive TTY (cron/systemd). Don’t attach; also don’t start tasks.
-            echo "Created tmux session 'start' but no interactive TTY detected."
-            echo "Attach from a terminal: tmux attach -t start"
+            printf "${YELLOW}[WARN]${NC} Created tmux session 'start' but no interactive TTY detected.\n"
+            printf "${YELLOW}[NOTICE]${NC} Attach from a terminal: tmux attach -t start\n"
         fi
 
 }

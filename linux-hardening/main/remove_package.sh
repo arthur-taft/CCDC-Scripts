@@ -3,18 +3,18 @@
 function remove_package() {
     local package_manager="$1"
     if [[ -z "$package_manager" ]]; then
-        echo "No package manager provided to remove package :("
+        printf "${RED}[ERROR]${NC} No package manager provided to remove package :(\n"
         exit 1
     fi
 
     local package_name="$2"
     if [[ -z "$package_name" ]]; then
-        echo "No package name provided to remove package :("
+        printf "${RED}[ERROR]${NC} No package name provided to remove package :(\n"
         exit 1
     fi
 
     if [[ "$package_manager" == "unsupported" ]]; then
-        echo "Unsupported operating system :("
+        printf "${RED}[ERROR]${NC} Unsupported operating system :(\n"
         exit 1
     fi
 
@@ -40,7 +40,7 @@ function remove_package() {
             zypper remove -y "$package_name"
             ;;
         *)
-            echo "Unsupported package manager :("
+            printf "${RED}[ERROR]${NC} Unsupported package manager :(\n"
             exit 1
             ;;
     esac

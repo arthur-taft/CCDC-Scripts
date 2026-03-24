@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
+source ./colors.sh
+
 function interface_up() {
     local flag="$1"
 
     if [ "$flag" = "false" ]; then
-        echo "Modifying network interfaces is disabled"
+        printf "${YELLOW}[WARN]${NC} Network interface modification is disabled\n"
         return 0
     fi
 
